@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+import sys
 import socketio
 import pprint
 
@@ -5,7 +8,7 @@ pp = pprint.PrettyPrinter(indent=4)
 sio = socketio.Client()
 
 server_url = 'https://api.sec-api.io:3334'
-api_key = '7d2ea0730f7b2a1fff304b1e91abf634cd020a14e0ed0b6535f22f2443a18f30'
+api_key = str(sys.argv[1])
 connection_string = server_url + '?apiKey=' + api_key
 
 

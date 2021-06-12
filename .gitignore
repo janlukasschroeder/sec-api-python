@@ -2,3 +2,4 @@ env
 dist
 build
 .idea
+.pypirc
