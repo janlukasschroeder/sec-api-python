@@ -1,8 +1,0 @@
-LICENSE
-README.md
-setup.py
-sec-api/__init__.py
-sec_api.egg-info/PKG-INFO
-sec_api.egg-info/SOURCES.txt
-sec_api.egg-info/dependency_links.txt
-sec_api.egg-info/top_level.txt

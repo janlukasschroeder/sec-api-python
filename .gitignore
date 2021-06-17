@@ -4,4 +4,4 @@ build
 .idea
 .pypirc
 sec_api.egg-info
-sec_api.egg-info/*
+sec_api.egg-info

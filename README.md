@@ -42,12 +42,16 @@ Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_
 
 # SEC EDGAR Filings Query API
 
-The below example retrieves all 10-Q filings filed by TSLA in 2020.
+The query API allows you to search and filter all 18 million filings published on SEC EDGAR.
+
+---
+
+The example below retrieves all 10-Q filings filed by TSLA in 2020.
 
 ```python
 from sec_api import QueryApi
 
-queryApi = QueryApi(api_key='YOUR_API_KEY')
+queryApi = QueryApi(api_key="YOUR_API_KEY")
 
 query = {
   "query": { "query_string": { 
@@ -93,13 +97,21 @@ query = {
 filings = queryApi.get_filings(query)
 ```
 
+> See the documentation for more details: https://sec-api.io/docs/query-api
+
+
 
 # SEC EDGAR Filings Real-Time Stream API
+
+The stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR.
+A new filing is sent to your connected client as soon as its published.
+
+---
 
 Install the `socketio` client:
 
 ```bash
-pip install python-engineio==3.14.2 python-socketio[client]==4.6.0`
+pip install python-engineio==3.14.2 python-socketio[client]==4.6.0
 ```
 
 Run the example script below. Get your free API key on [sec-api.io](https://sec-api.io)
@@ -110,18 +122,67 @@ import socketio
 
 sio = socketio.Client()
 
-@sio.on('connect', namespace='/all-filings')
+@sio.on("connect", namespace="/all-filings")
 def on_connect():
     print("Connected to https://api.sec-api.io:3334/all-filings")
 
-@sio.on('filing', namespace='/all-filings')
+@sio.on("filing", namespace="/all-filings")
 def on_filings(filing):
     print(filing)
 
-sio.connect('https://api.sec-api.io:3334?apiKey=YOUR_API_KEY', namespaces=['/all-filings'])
+sio.connect("https://api.sec-api.io:3334?apiKey=YOUR_API_KEY", namespaces=["/all-filings"])
 sio.wait()
 ```
 
+# Full-Text Search API
+
+Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. 
+The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
+
+---
+
+The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, 
+that include the exact phrase "LPCN 1154".
+
+
+```python
+from sec_api import FullTextSearchApi
+
+fullTextSearchApi = FullTextSearchApi(api_key="YOUR_API_KEY")
+
+query = {
+  "query": '"LPCN 1154"',
+  "formTypes": ['8-K', '10-Q'],
+  "startDate": '2021-01-01',
+  "endDate": '2021-06-14',
+}
+
+filings = fullTextSearchApi.get_filings(query)
+
+print(filings)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/full-text-search-api
+
+
+# Filing Render API
+
+Used to fetch the content of any filing or exhibit.
+
+
+```python
+from sec_api import RenderApi
+
+renderApi = RenderApi(api_key="YOUR_API_KEY")
+
+url = "https://www.sec.gov/Archives/edgar/data/1662684/000110465921082303/tm2119986d1_8k.htm"
+
+filing = renderApi.get_filing(url)
+
+print(filing)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
 
 # Response Format
