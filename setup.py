@@ -18,8 +18,8 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
+        "Operating System :: OS Independent",
         "Topic :: Software Development :: Build Tools",
-        "Topic :: Operating System :: OS Independent",
         "Topic :: Office/Business :: Financial",
         "Topic :: Office/Business :: Financial :: Investment",
         "Topic :: Software Development :: Libraries :: Python Modules",
