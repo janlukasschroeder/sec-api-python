@@ -132,7 +132,7 @@ def on_connect():
 def on_filings(filing):
     print(filing)
 
-sio.connect("https://api.sec-api.io:3334?apiKey=YOUR_API_KEY", namespaces=["/all-filings"])
+sio.connect("https://api.sec-api.io:3334?apiKey=YOUR_API_KEY", namespaces=["/all-filings"], transports=["websocket"])
 sio.wait()
 ```
 
