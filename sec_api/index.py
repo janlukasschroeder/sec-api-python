@@ -5,6 +5,7 @@ query_api_endpoint = "https://api.sec-api.io"
 full_text_search_api_endpoint = "https://api.sec-api.io/full-text-search"
 render_api_endpoint = "https://api.sec-api.io/filing-reader"
 xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
+extractor_api_endpoint = "https://api.sec-api.io/extractor"
 
 
 class QueryApi:
@@ -76,3 +77,30 @@ class XbrlApi:
 
         response = requests.get(_url)
         return json.loads(response.text)
+
+
+class ExtractorApi:
+    """
+    Base class for 10-K/10-Q item/section extractor API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = extractor_api_endpoint + "?token=" + api_key
+
+    def get_section(self, filing_url="", section="1A", return_type="text"):
+        if len(filing_url) == 0:
+            raise ValueError("filing_url must be present")
+
+        _url = (
+            self.api_endpoint
+            + "&url="
+            + filing_url
+            + "&item="
+            + section
+            + "&type="
+            + return_type
+        )
+
+        response = requests.get(_url)
+        return response.text

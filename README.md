@@ -6,6 +6,7 @@ It includes:
 - Query and Full-Text Search API
 - Real-Time Stream API
 - XBRL-to-JSON Converter API + Financial Statements
+- 10-K/10-Q Section Extraction API
 - Filing Render & Download API
 
 
@@ -356,6 +357,53 @@ Note: response is shortened.
 
 > See the documentation for more details: https://sec-api.io/docs/xbrl-to-json-converter-api
 
+# 10-K/10-Q Section Extractor API
+
+The Extractor API returns individual sections from 10-Q and 10-K filings. The extracted section is cleaned and standardized - in raw text or in standardized HTML. You can programmatically extract one or multiple sections from any 10-Q and 10-K filing.
+
+All 10-K and 10-Q sections can be extracted:
+
+- 1 - Business
+- 1A - Risk Factors
+- 1B - Unresolved Staff Comments
+- 2 - Properties
+- 3 - Legal Proceedings
+- 4 - Mine Safety Disclosures
+- 5 - Market for Registrant’s Common Equity, Related Stockholder Matters and Issuer Purchases of Equity Securities
+- 6 - Selected Financial Data (prior to February 2021)
+- 7 - Management’s Discussion and Analysis of Financial Condition and Results of Operations
+- 7A - Quantitative and Qualitative Disclosures about Market Risk
+- 8 - Financial Statements and Supplementary Data
+- 9 - Changes in and Disagreements with Accountants on Accounting and Financial Disclosure
+- 9A - Controls and Procedures
+- 9B - Other Information
+- 10 - Directors, Executive Officers and Corporate Governance
+- 11 - Executive Compensation
+- 12 - Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters
+- 13 - Certain Relationships and Related Transactions, and Director Independence
+- 14 - Principal Accountant Fees and Services
+
+## Usage
+
+```python
+from sec_api import ExtractorApi
+
+extractorApi = ExtractorApi("YOUR_API_KEY")
+
+# Tesla 10-K filing
+filing_url = "https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm"
+
+# get the standardized and cleaned text of section 1A "Risk Factors"
+section_text = extractorApi.get_section(filing_url, "1A", "text")
+
+# get the original HTML of section 7 "Management’s Discussion and Analysis of Financial Condition and Results of Operations"
+section_html = extractorApi.get_section(filing_url, "7", "html")
+
+print(section_text)
+print(section_html)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
 
 
 # Filing Render & Download API
@@ -377,7 +425,7 @@ print(filing)
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
 
-# Response Format
+# Query API Response Format
 
 - `accessionNo` (string) - Accession number of filing, e.g. 0000028917-20-000033
 - `cik` (string) - CIK of the filing issuer. Important: trailing `0` are removed.
@@ -572,7 +620,7 @@ print(filing)
 
 # Contact
 
-Let me know how I can improve the library or if you have any feature
-suggestions. I'm happy to implement them.
+Let us know how we can improve the library or if you have any feature
+suggestions. We're happy to implement them.
 
 support@sec-api.io
