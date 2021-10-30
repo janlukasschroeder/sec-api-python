@@ -12,7 +12,7 @@ It includes:
 
 # Data Coverage
 
-- All +18 million SEC EDGAR filings dating back to 1993
+- All +18 million SEC EDGAR filings dating back to 1993 - 650,000 gigabyte of filings data.
 - **All +150 filing types** are supported, eg 10-Q, 10-K, 4, 8-K, 13-F, S-1, 424B4 and many more.
   [See the list of supported form types here.](https://sec-api.io/list-of-sec-filing-types)
 - Newly published filings are accessible in real-time

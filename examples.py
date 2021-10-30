@@ -1,10 +1,23 @@
-from sec_api.index import XbrlApi, ExtractorApi
+from sec_api.index import RenderApi, XbrlApi, ExtractorApi
+
+#
+# Render API
+#
+"""
+renderApi = RenderApi("YOUR_API_KEY")
+
+# 10-K HTM File URL example
+filing_data = renderApi.get_filing(
+    url="https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+)
+
+print(filing_data)
+"""
 
 #
 # XBRL-to-JSON API example
 #
-
-# """
+"""
 xbrlApi = XbrlApi("YOUR_API_KEY")
 
 
@@ -24,13 +37,13 @@ xbrl_json_2 = xbrlApi.xbrl_to_json(
 
 # 10-K XBRL File URL example
 xbrl_json_3 = xbrlApi.xbrl_to_json(accession_no="0001564590-21-004599")
-# """
+
+"""
 
 #
 # Extractor API Example
 #
-
-# """
+"""
 extractorApi = ExtractorApi("YOUR_API_KEY")
 
 # Tesla 10-K filing
@@ -41,4 +54,4 @@ section_html = extractorApi.get_section(filing_url, "1A", "html")
 
 print(section_text)
 print(section_html)
-# """
+"""

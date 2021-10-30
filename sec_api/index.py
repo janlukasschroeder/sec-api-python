@@ -1,9 +1,10 @@
 import requests
 import json
+import re
 
 query_api_endpoint = "https://api.sec-api.io"
 full_text_search_api_endpoint = "https://api.sec-api.io/full-text-search"
-render_api_endpoint = "https://api.sec-api.io/filing-reader"
+render_api_endpoint = "https://archive.sec-api.io"
 xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
 extractor_api_endpoint = "https://api.sec-api.io/extractor"
 
@@ -43,10 +44,11 @@ class RenderApi:
 
     def __init__(self, api_key):
         self.api_key = api_key
-        self.api_endpoint = render_api_endpoint + "?token=" + api_key
+        self.api_endpoint = render_api_endpoint
 
     def get_filing(self, url):
-        _url = self.api_endpoint + "&type=html&url=" + url
+        filename = re.sub(r"https://www.sec.gov/Archives/edgar/data", "", url)
+        _url = self.api_endpoint + filename + "?token=" + self.api_key
         response = requests.get(_url)
         return response.text
 
