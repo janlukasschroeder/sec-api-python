@@ -425,6 +425,82 @@ print(filing)
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
 
+# CUSIP/CIK/Ticker Mapping API
+
+Resolve a CUSIP, CIK, ticker symbol or company name to a set of standardized company details. Listing companies by exchange, sector and industry is also supported.
+
+Map any of the following parameters to company details:
+- CUSIP
+- CIK
+- Ticker
+- Company name
+- Exchange
+- Sector
+- Industry
+
+The function returns an array of all matching companies in JSON format. For example, a look up of the ticker `IBM` returns multiple matches including `IBMD` and `IBME`.
+
+A company object includes the following properties:
+
+- `name` (string) - the name of the company, e.g. Tesla Inc
+- `ticker` (string) - the ticker symbol of the company.
+- `cik` (string) - the CIK of the company. Trailing zeros are removed.
+- `cusip` (string) - one or multiple CUSIPs linked to the company. Multiple CUSIPs are delimited by space, e.g. "054748108 92931L302 92931L401"
+- `exchange` (string) - the main exchange the company is listed on, e.g. NASDAQ
+- `isDelisted` (boolean) - true if the company is no longer listed, false otherwise.
+- `category` (string) - the security category, e.g. "Domestic Common Stock"
+- `sector` (string) - the sector of the company, e.g. "Consumer Cyclical"
+- `industry` (string) - the industry of the company, e.g. "Auto Manufacturers"
+- `sic` (string) - four-digit SIC code, e.g. "3711"
+- `sicSector` (string) - SIC sector name of the company, e.g. "Manufacturing"
+- `sicIndustry` (string) - SIC industry name of the company, e.g. "Motor Vehicles & Passenger Car Bodies"
+- `currency` (string) - operating currency of the company, e.g. "USD"
+- `location` (string) - location of the company's headquarters
+- `id` (string) - unique internal ID of the company, e.g. "e27d6e9606f216c569e46abf407685f3"
+
+Response type: `JSON`
+
+## Usage
+
+```python
+from sec_api import MappingApi
+
+mappingApi = MappingApi(api_key="YOUR_API_KEY")
+
+result1 = mappingApi.resolve("ticker", "TSLA")
+result2 = mappingApi.resolve("cik", "1318605")
+result3 = mappingApi.resolve("cusip", "88160R101")
+result4 = mappingApi.resolve("exchange", "NASDAQ")
+```
+
+### Response Example
+```json
+[
+    {
+        "name": "Tesla Inc",
+        "ticker": "TSLA",
+        "cik": "1318605",
+        "cusip": "88160R101",
+        "exchange": "NASDAQ",
+        "isDelisted": false,
+        "category": "Domestic Common Stock",
+        "sector": "Consumer Cyclical",
+        "industry": "Auto Manufacturers",
+        "sic": "3711",
+        "sicSector": "Manufacturing",
+        "sicIndustry": "Motor Vehicles & Passenger Car Bodies",
+        "famaSector": "",
+        "famaIndustry": "Automobiles and Trucks",
+        "currency": "USD",
+        "location": "California; U.S.A",
+        "id": "e27d6e9606f216c569e46abf407685f3"
+    }
+]
+```
+
+> See the documentation for more details: https://sec-api.io/docs/mapping-api
+
+
 # Query API Response Format
 
 - `accessionNo` (string) - Accession number of filing, e.g. 0000028917-20-000033
