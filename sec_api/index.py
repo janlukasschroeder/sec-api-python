@@ -30,7 +30,7 @@ class QueryApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
@@ -55,7 +55,7 @@ class FullTextSearchApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
@@ -83,7 +83,7 @@ class RenderApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
@@ -123,7 +123,7 @@ class XbrlApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
@@ -161,7 +161,7 @@ class ExtractorApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
@@ -211,7 +211,7 @@ class MappingApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception("API error: " + str(response.status_code))
         else:
             # request failed
             raise Exception("API error")
