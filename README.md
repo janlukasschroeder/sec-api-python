@@ -6,8 +6,9 @@ It includes:
 - Query and Full-Text Search API
 - Real-Time Stream API
 - XBRL-to-JSON Converter API + Financial Statements
-- 10-K/10-Q Section Extraction API
+- 10-K/10-Q/8-K Section Extraction API
 - Filing Render & Download API
+- Executive Compensation Data API
 
 
 # Data Coverage
@@ -357,11 +358,11 @@ Note: response is shortened.
 
 > See the documentation for more details: https://sec-api.io/docs/xbrl-to-json-converter-api
 
-# 10-K/10-Q Section Extractor API
+# 10-K/10-Q/8-K Section Extractor API
 
-The Extractor API returns individual sections from 10-Q and 10-K filings. The extracted section is cleaned and standardized - in raw text or in standardized HTML. You can programmatically extract one or multiple sections from any 10-Q and 10-K filing.
+The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. The extracted section is cleaned and standardized - in raw text or in standardized HTML. You can programmatically extract one or multiple sections from any 10-Q, 10-K and 8-K filing.
 
-All 10-K and 10-Q sections can be extracted:
+**All 10-K sections can be extracted:**
 
 - 1 - Business
 - 1A - Risk Factors
@@ -383,6 +384,62 @@ All 10-K and 10-Q sections can be extracted:
 - 13 - Certain Relationships and Related Transactions, and Director Independence
 - 14 - Principal Accountant Fees and Services
 
+**All 10-Q sections can be extracted:**
+
+Part 1:
+- 1 - Financial Statements
+- 2 - Management’s Discussion and Analysis of Financial Condition and Results of Operations
+- 3 - Quantitative and Qualitative Disclosures About Market Risk
+- 4 - Controls and Procedures
+
+Part 2:
+- 1 - Legal Proceedings
+- 1A - Risk Factors
+- 2 -Unregistered Sales of Equity Securities and Use of Proceeds
+- 3 - Defaults Upon Senior Securities
+- 4 - Mine Safety Disclosures
+- 5 - Other Information
+- 6 - Exhibits
+
+**All 8-K sections can be extracted:**
+
+- 1.01: Entry into a Material Definitive Agreement
+- 1.02: Termination of a Material Definitive Agreement
+- 1.03: Bankruptcy or Receivership
+- 1.04: Mine Safety - Reporting of Shutdowns and Patterns of Violations
+- 2.01: Completion of Acquisition or Disposition of Assets
+- 2.02: Results of Operations and Financial Condition
+- 2.03: Creation of a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement of a Registrant
+- 2.04: Triggering Events That Accelerate or Increase a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement
+- 2.05: Cost Associated with Exit or Disposal Activities
+- 2.06: Material Impairments
+- 3.01: Notice of Delisting or Failure to Satisfy a Continued Listing Rule or Standard; Transfer of Listing
+- 3.02: Unregistered Sales of Equity Securities
+- 3.03: Material Modifications to Rights of Security Holders
+- 4.01: Changes in Registrant's Certifying Accountant
+- 4.02: Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review
+- 5.01: Changes in Control of Registrant
+- 5.02: Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers: Compensatory Arrangements of Certain Officers
+- 5.03: Amendments to Articles of Incorporation or Bylaws; Change in Fiscal Year
+- 5.04: Temporary Suspension of Trading Under Registrant's Employee Benefit Plans
+- 5.05: Amendments to the Registrant's Code of Ethics, or Waiver of a Provision of the Code of Ethics
+- 5.06: Change in Shell Company Status
+- 5.07: Submission of Matters to a Vote of Security Holders
+- 5.08: Shareholder Nominations Pursuant to Exchange Act Rule 14a-11
+- 6.01: ABS Informational and Computational Material
+- 6.02: Change of Servicer or Trustee
+- 6.03: Change in Credit Enhancement or Other External Support
+- 6.04: Failure to Make a Required Distribution
+- 6.04: Failure to Make a Required Distribution
+- 6.04: Failure to Make a Required Distribution
+- 6.05: Securities Act Updating Disclosure
+- 6.06: Static Pool
+- 6.10: Alternative Filings of Asset-Backed Issuers
+- 7.01: Regulation FD Disclosure
+- 8.01: Other Events
+- 9.01: Financial Statements and Exhibits
+- Signature
+
 ## Usage
 
 ```python
@@ -390,17 +447,34 @@ from sec_api import ExtractorApi
 
 extractorApi = ExtractorApi("YOUR_API_KEY")
 
+#
+# 10-K example
+#
 # Tesla 10-K filing
-filing_url = "https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm"
+filing_url_10k = "https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm"
 
 # get the standardized and cleaned text of section 1A "Risk Factors"
-section_text = extractorApi.get_section(filing_url, "1A", "text")
+section_text = extractorApi.get_section(filing_url_10k, "1A", "text")
 
 # get the original HTML of section 7 "Management’s Discussion and Analysis of Financial Condition and Results of Operations"
-section_html = extractorApi.get_section(filing_url, "7", "html")
+section_html = extractorApi.get_section(filing_url_10k, "7", "html")
 
-print(section_text)
-print(section_html)
+#
+# 10-Q example
+#
+# Tesla 10-Q filing
+filing_url_10q = "https://www.sec.gov/Archives/edgar/data/1318605/000095017022006034/tsla-20220331.htm"
+
+# extract section 1A "Risk Factors" in part 2 as cleaned text
+extracted_section_10q = extractorApi.get_section(filing_url_10q, "part2item1a", "text")
+
+#
+# 8-K example
+#
+filing_url_8k = "https://www.sec.gov/Archives/edgar/data/66600/000149315222016468/form8-k.htm"
+
+# extract section 1.01 "Entry into Material Definitive Agreement" as cleaned text
+extracted_section_8k = extractorApi.get_section(filing_url_8k, "1-1", "text")
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
@@ -499,6 +573,59 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/mapping-api
+
+# Executive Compensation Data API
+
+The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time. 
+
+You can search compensation data by 13 parameters, such as company ticker, executive name & position, annual salary, option awards and more.
+
+```python
+from sec_api import ExecCompApi
+
+execCompApi = ExecCompApi("YOUR_API_KEY")
+
+# Get data by ticker
+result_ticker = execCompApi.get_data("TSLA")
+
+# Get data by CIK
+result_cik = execCompApi.get_data("789019")
+
+# List all exec compensations of CIK 70858 for year 2020 and 2019
+# Sort result by year first, by name second
+query = {
+    "query": {"query_string": {"query": "cik:70858 AND (year:2020 OR year:2019)"}},
+    "from": "0",
+    "size": "200",
+    "sort": [{"year": {"order": "desc"}}, {"name.keyword": {"order": "asc"}}],
+}
+result_query = execCompApi.get_data(query)
+```
+
+### Response Example
+```json
+[
+    {
+        "id": "8e9177e3bcdb30ada8d092c195bd9d63",
+        "cik": "1318605",
+        "ticker": "TSLA",
+        "name": "Andrew Baglino",
+        "position": "SVP, Powertrain and Energy Engineering",
+        "year": 2020,
+        "salary": 283269,
+        "bonus": 0,
+        "stockAwards": 0,
+        "optionAwards": 46261354,
+        "nonEquityIncentiveCompensation": 0,
+        "changeInPensionValueAndDeferredEarnings": 0,
+        "otherCompensation": 0,
+        "total": 46544623
+    }
+    // and many more
+]
+```
+
+> See the documentation for more details: https://sec-api.io/docs/executive-compensation-api
 
 
 # Query API Response Format

@@ -1,4 +1,4 @@
-from sec_api.index import RenderApi, XbrlApi, ExtractorApi, MappingApi
+from sec_api.index import RenderApi, XbrlApi, ExtractorApi, MappingApi, ExecCompApi
 
 #
 # Render API
@@ -65,4 +65,33 @@ mappingApi = MappingApi("YOUR_API_KEY")
 result = mappingApi.resolve("cik", "927355")
 
 print(result)
+# """
+
+
+#
+# Executive Compensation Data API Example
+#
+"""
+execCompApi = ExecCompApi("YOUR_API_KEY")
+
+# Get data by ticker
+result_ticker = execCompApi.get_data("TSLA")
+
+# Get data by CIK
+result_cik = execCompApi.get_data("789019")
+
+# List all exec compensations of CIK 70858 for year 2020 and 2019
+# Sort result by year first, by name second
+query = {
+    "query": {"query_string": {"query": "cik:70858 AND (year:2020 OR year:2019)"}},
+    "from": "0",
+    "size": "200",
+    "sort": [{"year": {"order": "desc"}}, {"name.keyword": {"order": "asc"}}],
+}
+result_query = execCompApi.get_data(query)
+
+
+print(result_ticker)
+print(result_cik)
+print(result_query)
 # """
