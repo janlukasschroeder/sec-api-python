@@ -30,7 +30,9 @@ class QueryApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
@@ -55,7 +57,9 @@ class FullTextSearchApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
@@ -83,7 +87,9 @@ class RenderApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
@@ -123,7 +129,9 @@ class XbrlApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
@@ -131,7 +139,7 @@ class XbrlApi:
 
 class ExtractorApi:
     """
-    Base class for 10-K/10-Q item/section extractor API
+    Base class for 10-K/10-Q/8-K item/section extractor API
     """
 
     def __init__(self, api_key):
@@ -161,7 +169,9 @@ class ExtractorApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
@@ -211,7 +221,9 @@ class MappingApi:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
-                raise Exception("API error: " + response.status_code)
+                raise Exception(
+                    "API error: " + str(response.status_code) + " - " + response.text
+                )
         else:
             # request failed
             raise Exception("API error")
