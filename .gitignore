@@ -1,9 +1,9 @@
+venv
 env
 dist
 build
 .idea
 .pypirc
-sec_api.egg-info
 sec_api.egg-info
 deploy.sh
 sec_api/__pycache__

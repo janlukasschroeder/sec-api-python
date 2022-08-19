@@ -3,12 +3,15 @@
 **sec-api** is a Python package for querying the entire SEC filings corpus in real-time without the need to download filings. 
 It includes:
 
-- Query and Full-Text Search API
-- Real-Time Stream API
-- XBRL-to-JSON Converter API + Financial Statements
-- 10-K/10-Q/8-K Section Extraction API
-- Filing Render & Download API
-- Executive Compensation Data API
+- [Query and Full-Text Search API](#sec-edgar-filings-query-api)
+- [Real-Time Stream API](#sec-edgar-filings-real-time-stream-api)
+- [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
+- [10-K/10-Q/8-K Section Extraction API](#10-k-10-q-8-k-section-extractor-api)
+- [Filing Download & PDF Render API](#filing-render-download-api)
+- [Executive Compensation Data API](#executive-compensation-data-api) 
+- [Insider Trading Data API](#insider-trading-data-api)
+- [13F Institutional Investor Database](#13f-institutional-investor-database)
+- [CUSIP/CIK/Ticker Mapping API](#cusip-cik-ticker-mapping-api) 
 
 
 # Data Coverage
@@ -86,6 +89,7 @@ query = {
 filings = queryApi.get_filings(query)
 ```
 
+## 13F Institutional Investor Database
 Fetch most recent 13F filings that hold Tesla
 
 ```python
@@ -627,6 +631,77 @@ result_query = execCompApi.get_data(query)
 
 > See the documentation for more details: https://sec-api.io/docs/executive-compensation-api
 
+# Insider Trading Data API
+
+The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed 
+companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are 
+fully searchable. The insider trading database includes information about the CIK and name of the insider, 
+her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price, 
+the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such 
+as the effect of Rule 10b-18 or 10b5-1 stock purchase plans and more. The full list of all data points is available below.
+
+```python
+from sec_api import InsiderTradingApi
+
+insiderTradingApi = InsiderTradingApi("YOUR_API_KEY")
+
+insider_trades = insiderTradingApi.get_data({
+  "query": {"query_string": {"query": "issuer.tradingSymbol:TSLA"}}
+})
+
+print(insider_trades["transactions"])
+```
+
+### Response Example
+```json
+[
+    {
+        "accessionNo": "0000899243-22-028189",
+        "filedAt": "2022-08-09T21:23:00-04:00",
+        "documentType": "4",
+        "periodOfReport": "2022-08-09",
+        "issuer": {"cik": "1318605", "name": "Tesla, Inc.", "tradingSymbol": "TSLA"},
+        "reportingOwner": {
+            "cik": "1494730",
+            "name": "Musk Elon",
+            "address": {
+                "street1": "C/O TESLA, INC.",
+                "street2": "1 TESLA ROAD",
+                "city": "AUSTIN",
+                "state": "TX",
+                "zipCode": "78725"
+            },
+            "relationship": {
+                "isDirector": true,
+                "isOfficer": true,
+                "officerTitle": "CEO",
+                "isTenPercentOwner": true,
+                "isOther": false
+            }
+        },
+        "nonDerivativeTable": {
+            "transactions": [
+                {
+                    "securityTitle": "Common Stock",
+                    "transactionDate": "2022-08-09",
+                    "coding": {
+                        "formType": "4",
+                        "code": "S",
+                        "equitySwapInvolved": false
+                    },
+                    "amounts": {
+                        "shares": 435,
+                        "pricePerShare": 872.469,
+                        "pricePerShareFootnoteId": ["F1"],
+                        "acquiredDisposedCode": "D"
+                    }
+                }
+            ]
+           // and many more
+        }
+    }
+]
+```
 
 # Query API Response Format
 

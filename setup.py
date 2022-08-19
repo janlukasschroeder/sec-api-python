@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="sec-api",
-    version="1.0.12",
+    version="1.0.13",
     author="SEC API",
     author_email="support@sec-api.io",
     description="SEC EDGAR Filings API",
@@ -32,15 +32,22 @@ setup(
     keywords=[
         "SEC EDGAR API",
         "SEC Filings API",
+        "SEC Full-Text Search API",
         "EDGAR API",
         "Finance",
         "CIK",
         "CUSIP",
+        "CUSIP to Ticker",
+        "CUSIP to CIK",
         "10-Q",
         "10-K",
         "8-K",
         "S-1",
         "424B4",
+        "XBRL Converter",
+        "Financial Statements API",
+        "Insider Trading Data",
+        "Executive Compensation Data",
     ],
     project_urls={
         "Bug Reports": "https://github.com/janlukasschroeder/sec-api-python/issues",

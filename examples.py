@@ -1,4 +1,11 @@
-from sec_api.index import RenderApi, XbrlApi, ExtractorApi, MappingApi, ExecCompApi
+from sec_api.index import (
+    RenderApi,
+    XbrlApi,
+    ExtractorApi,
+    MappingApi,
+    ExecCompApi,
+    InsiderTradingApi,
+)
 
 #
 # Render API
@@ -94,4 +101,23 @@ result_query = execCompApi.get_data(query)
 print(result_ticker)
 print(result_cik)
 print(result_query)
+# """
+
+
+#
+# Insider Trading Data API Example
+#
+"""
+insiderTradingApi = InsiderTradingApi("YOUR_API_KEY")
+
+insider_trades = insiderTradingApi.get_data(
+    {
+        "query": {"query_string": {"query": "issuer.tradingSymbol:TSLA"}},
+        "from": "0",
+        "size": "50",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(insider_trades["transactions"])
 # """

@@ -10,6 +10,7 @@ xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
 extractor_api_endpoint = "https://api.sec-api.io/extractor"
 mapping_api_endpoint = "https://api.sec-api.io/mapping"
 exec_comp_api_endpoint = "https://api.sec-api.io/compensation"
+insider_api_endpoint = "https://api.sec-api.io/insider-trading"
 
 
 def handle_api_error(response):
@@ -77,7 +78,7 @@ class RenderApi:
         self.api_key = api_key
         self.api_endpoint = render_api_endpoint
 
-    def get_filing(self, url):
+    def get_filing(self, url, as_pdf=False):
         response = {}
         filename = re.sub(r"https://www.sec.gov/Archives/edgar/data", "", url)
         _url = self.api_endpoint + filename + "?token=" + self.api_key
@@ -262,6 +263,32 @@ class ExecCompApi:
                 _url = self.api_endpoint + "?token=" + self.api_key
                 response = requests.post(_url, json=parameter)
 
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class InsiderTradingApi:
+    """
+    Base class for Insider Trading Data API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = insider_api_endpoint + "?token=" + api_key
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint, json=query)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
