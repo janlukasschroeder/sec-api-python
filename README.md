@@ -6,12 +6,12 @@ It includes:
 - [Query and Full-Text Search API](#sec-edgar-filings-query-api)
 - [Real-Time Stream API](#sec-edgar-filings-real-time-stream-api)
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
-- [10-K/10-Q/8-K Section Extraction API](#10-k-10-q-8-k-section-extractor-api)
-- [Filing Download & PDF Render API](#filing-render-download-api)
+- [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
+- [Filing Download & PDF Render API](#filing-render--download-api)
 - [Executive Compensation Data API](#executive-compensation-data-api) 
 - [Insider Trading Data API](#insider-trading-data-api)
 - [13F Institutional Investor Database](#13f-institutional-investor-database)
-- [CUSIP/CIK/Ticker Mapping API](#cusip-cik-ticker-mapping-api) 
+- [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api) 
 
 
 # Data Coverage
