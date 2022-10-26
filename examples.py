@@ -5,6 +5,9 @@ from sec_api.index import (
     MappingApi,
     ExecCompApi,
     InsiderTradingApi,
+    FormNportApi,
+    FormDApi,
+    FormAdvApi,
 )
 
 #
@@ -120,4 +123,77 @@ insider_trades = insiderTradingApi.get_data(
 )
 
 print(insider_trades["transactions"])
+# """
+
+#
+# Form NPORT API Example
+#
+"""
+nportApi = FormNportApi("YOUR_API_KEY")
+
+response = nportApi.get_data(
+    {
+        "query": {"query_string": {"query": "fundInfo.totAssets:[100000000 TO *]"}},
+        "from": "0",
+        "size": "2",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+# """
+
+#
+# Form D API Example
+#
+"""
+formDApi = FormDApi("YOUR_API_KEY")
+
+response = formDApi.get_data(
+    {
+        "query": {
+            "query_string": {
+                "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]"
+            }
+        },
+        "from": "0",
+        "size": "10",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["offerings"])
+# """
+
+#
+# Form ADV API Example
+#
+"""
+formAdvApi = FormAdvApi("YOUR_API_KEY")
+
+response = formAdvApi.get_firms(
+    {
+        "query": {"query_string": {"query": "Info.FirmCrdNb:361"}},
+        "from": "0",
+        "size": "10",
+        "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+
+response = formAdvApi.get_individuals(
+    {
+        "query": {"query_string": {"query": "CrntEmps.CrntEmp.orgPK:149777"}},
+        "from": "0",
+        "size": "10",
+        "sort": [{"id": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+
+response = formAdvApi.get_brochures(149777)
+
+print(response["brochures"])
 # """

@@ -11,6 +11,9 @@ extractor_api_endpoint = "https://api.sec-api.io/extractor"
 mapping_api_endpoint = "https://api.sec-api.io/mapping"
 exec_comp_api_endpoint = "https://api.sec-api.io/compensation"
 insider_api_endpoint = "https://api.sec-api.io/insider-trading"
+form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
+form_d_api_endpoint = "https://api.sec-api.io/form-d"
+form_adv_endpoint = "https://api.sec-api.io/form-adv"
 
 
 def handle_api_error(response):
@@ -289,6 +292,123 @@ class InsiderTradingApi:
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
             response = requests.post(self.api_endpoint, json=query)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FormNportApi:
+    """
+    Base class for Form NPORT API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = form_nport_api_endpoint + "?token=" + api_key
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint, json=query)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FormDApi:
+    """
+    Base class for Form D API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = form_d_api_endpoint + "?token=" + api_key
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint, json=query)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FormAdvApi:
+    """
+    Base class for Form ADV API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint_firm = form_adv_endpoint + "/firm" + "?token=" + api_key
+        self.api_endpoint_individual = (
+            form_adv_endpoint + "/individual" + "?token=" + api_key
+        )
+        self.api_endpoint_brochures = form_adv_endpoint + "/brochures?token=" + api_key
+
+    def get_firms(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint_firm, json=query)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+    def get_individuals(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint_individual, json=query)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+    def get_brochures(self, crd):
+        endpoint = (
+            form_adv_endpoint + "/brochures/" + str(crd) + "?token=" + self.api_key
+        )
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(endpoint)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:

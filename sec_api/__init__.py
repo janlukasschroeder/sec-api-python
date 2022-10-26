@@ -7,3 +7,6 @@ from sec_api.index import ExtractorApi
 from sec_api.index import MappingApi
 from sec_api.index import ExecCompApi
 from sec_api.index import InsiderTradingApi
+from sec_api.index import FormNportApi
+from sec_api.index import FormDApi
+from sec_api.index import FormAdvApi

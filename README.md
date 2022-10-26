@@ -12,6 +12,9 @@ It includes:
 - [Insider Trading Data API](#insider-trading-data-api)
 - [13F Institutional Investor Database](#13f-institutional-investor-database)
 - [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api) 
+- [Form N-PORT API](#form-n-port-api) 
+- [Form D API](#form-d-api) 
+- [Form ADV API](#form-adv-api) 
 
 
 # Data Coverage
@@ -652,6 +655,8 @@ insider_trades = insiderTradingApi.get_data({
 print(insider_trades["transactions"])
 ```
 
+> See the documentation for more details: https://sec-api.io/docs/insider-ownership-trading-api
+
 ### Response Example
 ```json
 [
@@ -702,6 +707,102 @@ print(insider_trades["transactions"])
     }
 ]
 ```
+
+# Form N-PORT API 
+
+Access and find standardized N-PORT SEC filings. 
+
+```python
+from sec_api import FormNportApi
+
+nportApi = FormNportApi("YOUR_API_KEY")
+
+response = nportApi.get_data(
+    {
+        "query": {"query_string": {"query": "fundInfo.totAssets:[100000000 TO *]"}},
+        "from": "0",
+        "size": "10",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/n-port-data-api
+
+
+# Form D API
+
+Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by 
+hedge funds, type of securities offered and many more.
+
+```python
+from sec_api import FormDApi
+
+formDApi = FormDApi("YOUR_API_KEY")
+
+response = formDApi.get_data(
+    {
+        "query": {
+            "query_string": {
+                "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]"
+            }
+        },
+        "from": "0",
+        "size": "10",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["offerings"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
+
+
+# Form ADV API
+
+Search the entire ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), 
+individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings 
+filed by advisory firms and 380,000 individual advisers and is updated daily.
+Search and find ADV filings by any filing property, such as CRD, assets under management, 
+type of adviser (e.g. broker dealer) and more.
+
+```python
+from sec_api import FormAdvApi
+
+formAdvApi = FormAdvApi("YOUR_API_KEY")
+
+response = formAdvApi.get_firms(
+    {
+        "query": {"query_string": {"query": "Info.FirmCrdNb:361"}},
+        "from": "0",
+        "size": "10",
+        "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+
+response = formAdvApi.get_individuals(
+    {
+        "query": {"query_string": {"query": "CrntEmps.CrntEmp.orgPK:149777"}},
+        "from": "0",
+        "size": "10",
+        "sort": [{"id": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+
+response = formAdvApi.get_brochures(149777)
+
+print(response["brochures"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
+
 
 # Query API Response Format
 
@@ -771,7 +872,7 @@ print(insider_trades["transactions"])
   - `Shared` (integer) - Shared, e.g. 345
   - `None` (integer) - None, e.g. 345
 
-## Example JSON Response
+## Query API Example JSON Response
 
 ```json
 {
