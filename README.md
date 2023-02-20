@@ -15,7 +15,7 @@ It includes:
 - [Form N-PORT API](#form-n-port-api)
 - [Form D API](#form-d-api)
 - [Form ADV API](#form-adv-api)
-- [Float (Outstanding Shares) API](#float-api)
+- [Float (Outstanding Shares) API](#float-outstanding-shares-api)
 
 # Data Coverage
 
