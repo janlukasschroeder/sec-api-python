@@ -14,6 +14,7 @@ insider_api_endpoint = "https://api.sec-api.io/insider-trading"
 form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
 form_adv_endpoint = "https://api.sec-api.io/form-adv"
+float_api_endpoint = "https://api.sec-api.io/float"
 
 
 def handle_api_error(response):
@@ -409,6 +410,38 @@ class FormAdvApi:
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
             response = requests.get(endpoint)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FloatApi:
+    """
+    Base class for Float API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = float_api_endpoint + "?token=" + api_key
+
+    def get_float(self, ticker="", cik=""):
+        if len(ticker) == 0 and len(cik) == 0:
+            raise Exception("Invalid input")
+
+        response = {}
+
+        search_term = "&ticker=" + ticker if len(ticker) else "&cik=" + cik
+        url = self.api_endpoint + search_term
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(url)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:

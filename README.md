@@ -1,6 +1,6 @@
 # SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
 
-**sec-api** is a Python package for querying the entire SEC filings corpus in real-time without the need to download filings. 
+**sec-api** is a Python package for querying the entire SEC filings corpus in real-time without the need to download filings.
 It includes:
 
 - [Query and Full-Text Search API](#sec-edgar-filings-query-api)
@@ -8,14 +8,14 @@ It includes:
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
 - [Filing Download & PDF Render API](#filing-render--download-api)
-- [Executive Compensation Data API](#executive-compensation-data-api) 
+- [Executive Compensation Data API](#executive-compensation-data-api)
 - [Insider Trading Data API](#insider-trading-data-api)
 - [13F Institutional Investor Database](#13f-institutional-investor-database)
-- [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api) 
-- [Form N-PORT API](#form-n-port-api) 
-- [Form D API](#form-d-api) 
-- [Form ADV API](#form-adv-api) 
-
+- [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
+- [Form N-PORT API](#form-n-port-api)
+- [Form D API](#form-d-api)
+- [Form ADV API](#form-adv-api)
+- [Float (Outstanding Shares) API](#float-api)
 
 # Data Coverage
 
@@ -32,11 +32,9 @@ Data source: [sec.gov](https://www.sec.gov/edgar/searchedgar/companysearch.html)
 
 # Overview
 
-- The query API gives access to all over 18 million SEC Edgar filings of **over 8000** 
-publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
+- The query API gives access to all over 18 million SEC Edgar filings of **over 8000** publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
 - Connect to the real-time stream API to receive new filings as soon as they are published on SEC EDGAR
-- The full-text search API allows you to search the full text of all filings submitted since 2001. 
-The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
+- The full-text search API allows you to search the full text of all filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
 - Free API key available on [sec-api.io](https://sec-api.io)
 
 See the official documentation for more: [sec-api.io/docs](https://sec-api.io/docs)
@@ -48,7 +46,6 @@ pip install sec-api
 ```
 
 Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_KEY` with it.
-
 
 # SEC EDGAR Filings Query API
 
@@ -64,8 +61,8 @@ from sec_api import QueryApi
 queryApi = QueryApi(api_key="YOUR_API_KEY")
 
 query = {
-  "query": { "query_string": { 
-      "query": "ticker:TSLA AND filedAt:{2020-01-01 TO 2020-12-31} AND formType:\"10-Q\"" 
+  "query": { "query_string": {
+      "query": "ticker:TSLA AND filedAt:{2020-01-01 TO 2020-12-31} AND formType:\"10-Q\""
     } },
   "from": "0",
   "size": "10",
@@ -81,7 +78,7 @@ Fetch most recent 8-Ks with item 9.01
 
 ```python
 query = {
-  "query": { "query_string": { 
+  "query": { "query_string": {
       "query": "formType:\"8-K\" AND description:\"9.01\""
     } },
   "from": "0",
@@ -93,11 +90,12 @@ filings = queryApi.get_filings(query)
 ```
 
 ## 13F Institutional Investor Database
+
 Fetch most recent 13F filings that hold Tesla
 
 ```python
 query = {
-  "query": { "query_string": { 
+  "query": { "query_string": {
       "query": "formType:\"13F\" AND holdings.cusip:88160R101"
     } },
   "from": "0",
@@ -110,12 +108,10 @@ filings = queryApi.get_filings(query)
 
 > See the documentation for more details: https://sec-api.io/docs/query-api
 
-
-
 # SEC EDGAR Filings Real-Time Stream API
 
 The stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR.
-A new filing is sent to your connected client as soon as its published.
+A new filing is sent to your connected client as soon as it is published.
 
 ---
 
@@ -125,8 +121,7 @@ Install the `socketio` client:
 pip install python-engineio==3.14.2 python-socketio[client]==4.6.0
 ```
 
-Run the example script below. Get your free API key on [sec-api.io](https://sec-api.io)
-  and replace `YOUR_API_KEY` with it.
+Run the example script below. Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_KEY` with it.
 
 ```python
 import socketio
@@ -147,14 +142,11 @@ sio.wait()
 
 # Full-Text Search API
 
-Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. 
-The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
+Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
 
 ---
 
-The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, 
-that include the exact phrase "LPCN 1154".
-
+The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, that include the exact phrase "LPCN 1154".
 
 ```python
 from sec_api import FullTextSearchApi
@@ -174,7 +166,6 @@ print(filings)
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/full-text-search-api
-
 
 # XBRL-To-JSON Converter API
 
@@ -236,7 +227,6 @@ There are 3 ways to convert XBRL to JSON:
   Example URL: https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231_htm.xml
 - `accession_no`: Provide the accession number of the filing, e.g. `0001564590-21-004599`
 
-
 ```python
 from sec_api import XbrlApi
 
@@ -267,99 +257,99 @@ Note: response is shortened.
 
 ```json
 {
- "CoverPage": {
-  "DocumentPeriodEndDate": "2020-09-26",
-  "EntityRegistrantName": "Apple Inc.",
-  "EntityIncorporationStateCountryCode": "CA",
-  "EntityTaxIdentificationNumber": "94-2404110",
-  "EntityAddressAddressLine1": "One Apple Park Way",
-  "EntityAddressCityOrTown": "Cupertino",
-  "EntityAddressStateOrProvince": "CA",
-  "EntityAddressPostalZipCode": "95014",
-  "CityAreaCode": "408",
-  "LocalPhoneNumber": "996-1010",
-  "TradingSymbol": "AAPL",
-  "EntityPublicFloat": {
-   "decimals": "-6",
-   "unitRef": "usd",
-   "period": {
-    "instant": "2020-03-27"
-   },
-   "value": "1070633000000"
+  "CoverPage": {
+    "DocumentPeriodEndDate": "2020-09-26",
+    "EntityRegistrantName": "Apple Inc.",
+    "EntityIncorporationStateCountryCode": "CA",
+    "EntityTaxIdentificationNumber": "94-2404110",
+    "EntityAddressAddressLine1": "One Apple Park Way",
+    "EntityAddressCityOrTown": "Cupertino",
+    "EntityAddressStateOrProvince": "CA",
+    "EntityAddressPostalZipCode": "95014",
+    "CityAreaCode": "408",
+    "LocalPhoneNumber": "996-1010",
+    "TradingSymbol": "AAPL",
+    "EntityPublicFloat": {
+      "decimals": "-6",
+      "unitRef": "usd",
+      "period": {
+        "instant": "2020-03-27"
+      },
+      "value": "1070633000000"
+    },
+    "EntityCommonStockSharesOutstanding": {
+      "decimals": "-3",
+      "unitRef": "shares",
+      "period": {
+        "instant": "2020-10-16"
+      },
+      "value": "17001802000"
+    },
+    "DocumentFiscalPeriodFocus": "FY",
+    "CurrentFiscalYearEndDate": "--09-26"
   },
-  "EntityCommonStockSharesOutstanding": {
-   "decimals": "-3",
-   "unitRef": "shares",
-   "period": {
-    "instant": "2020-10-16"
-   },
-   "value": "17001802000"
+  "StatementsOfIncome": {
+    "RevenueFromContractWithCustomerExcludingAssessedTax": [
+      {
+        "decimals": "-6",
+        "unitRef": "usd",
+        "period": {
+          "startDate": "2019-09-29",
+          "endDate": "2020-09-26"
+        },
+        "segment": {
+          "dimension": "srt:ProductOrServiceAxis",
+          "value": "us-gaap:ProductMember"
+        },
+        "value": "220747000000"
+      },
+      {
+        "decimals": "-6",
+        "unitRef": "usd",
+        "period": {
+          "startDate": "2018-09-30",
+          "endDate": "2019-09-28"
+        },
+        "segment": {
+          "dimension": "srt:ProductOrServiceAxis",
+          "value": "us-gaap:ProductMember"
+        },
+        "value": "213883000000"
+      }
+    ]
   },
-  "DocumentFiscalPeriodFocus": "FY",
-  "CurrentFiscalYearEndDate": "--09-26"
- },
- "StatementsOfIncome": {
-  "RevenueFromContractWithCustomerExcludingAssessedTax": [
-   {
-    "decimals": "-6",
-    "unitRef": "usd",
-    "period": {
-     "startDate": "2019-09-29",
-     "endDate": "2020-09-26"
-    },
-    "segment": {
-     "dimension": "srt:ProductOrServiceAxis",
-     "value": "us-gaap:ProductMember"
-    },
-    "value": "220747000000"
-   },
-   {
-    "decimals": "-6",
-    "unitRef": "usd",
-    "period": {
-     "startDate": "2018-09-30",
-     "endDate": "2019-09-28"
-    },
-    "segment": {
-     "dimension": "srt:ProductOrServiceAxis",
-     "value": "us-gaap:ProductMember"
-    },
-    "value": "213883000000"
-   }
-  ]
- },
- "BalanceSheets": {
-  "CashAndCashEquivalentsAtCarryingValue": [
-   {
-    "decimals": "-6",
-    "unitRef": "usd",
-    "period": {
-     "instant": "2020-09-26"
-    },
-    "value": "38016000000"
-   },
-   {
-    "decimals": "-6",
-    "unitRef": "usd",
-    "period": {
-     "instant": "2019-09-28"
-    },
-    "value": "48844000000"
-   },
-   {
-    "decimals": "-6",
-    "unitRef": "usd",
-    "period": {
-     "instant": "2020-09-26"
-    },
-    "segment": {
-     "dimension": "us-gaap:FinancialInstrumentAxis",
-     "value": "us-gaap:CashMember"
-    },
-    "value": "17773000000"
-   }
-  ]
- }
+  "BalanceSheets": {
+    "CashAndCashEquivalentsAtCarryingValue": [
+      {
+        "decimals": "-6",
+        "unitRef": "usd",
+        "period": {
+          "instant": "2020-09-26"
+        },
+        "value": "38016000000"
+      },
+      {
+        "decimals": "-6",
+        "unitRef": "usd",
+        "period": {
+          "instant": "2019-09-28"
+        },
+        "value": "48844000000"
+      },
+      {
+        "decimals": "-6",
+        "unitRef": "usd",
+        "period": {
+          "instant": "2020-09-26"
+        },
+        "segment": {
+          "dimension": "us-gaap:FinancialInstrumentAxis",
+          "value": "us-gaap:CashMember"
+        },
+        "value": "17773000000"
+      }
+    ]
+  }
 }
 ```
 
@@ -394,12 +384,14 @@ The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. T
 **All 10-Q sections can be extracted:**
 
 Part 1:
+
 - 1 - Financial Statements
 - 2 - Management’s Discussion and Analysis of Financial Condition and Results of Operations
 - 3 - Quantitative and Qualitative Disclosures About Market Risk
 - 4 - Controls and Procedures
 
 Part 2:
+
 - 1 - Legal Proceedings
 - 1A - Risk Factors
 - 2 -Unregistered Sales of Equity Securities and Use of Proceeds
@@ -486,7 +478,6 @@ extracted_section_8k = extractorApi.get_section(filing_url_8k, "1-1", "text")
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
 
-
 # Filing Render & Download API
 
 Used to download any filing or exhibit. You can process the downloaded filing in memory or save the filing to your hard drive.
@@ -505,12 +496,12 @@ print(filing)
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
-
 # CUSIP/CIK/Ticker Mapping API
 
 Resolve a CUSIP, CIK, ticker symbol or company name to a set of standardized company details. Listing companies by exchange, sector and industry is also supported.
 
 Map any of the following parameters to company details:
+
 - CUSIP
 - CIK
 - Ticker
@@ -555,27 +546,28 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 ```
 
 ### Response Example
+
 ```json
 [
-    {
-        "name": "Tesla Inc",
-        "ticker": "TSLA",
-        "cik": "1318605",
-        "cusip": "88160R101",
-        "exchange": "NASDAQ",
-        "isDelisted": false,
-        "category": "Domestic Common Stock",
-        "sector": "Consumer Cyclical",
-        "industry": "Auto Manufacturers",
-        "sic": "3711",
-        "sicSector": "Manufacturing",
-        "sicIndustry": "Motor Vehicles & Passenger Car Bodies",
-        "famaSector": "",
-        "famaIndustry": "Automobiles and Trucks",
-        "currency": "USD",
-        "location": "California; U.S.A",
-        "id": "e27d6e9606f216c569e46abf407685f3"
-    }
+  {
+    "name": "Tesla Inc",
+    "ticker": "TSLA",
+    "cik": "1318605",
+    "cusip": "88160R101",
+    "exchange": "NASDAQ",
+    "isDelisted": false,
+    "category": "Domestic Common Stock",
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers",
+    "sic": "3711",
+    "sicSector": "Manufacturing",
+    "sicIndustry": "Motor Vehicles & Passenger Car Bodies",
+    "famaSector": "",
+    "famaIndustry": "Automobiles and Trucks",
+    "currency": "USD",
+    "location": "California; U.S.A",
+    "id": "e27d6e9606f216c569e46abf407685f3"
+  }
 ]
 ```
 
@@ -583,7 +575,7 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 
 # Executive Compensation Data API
 
-The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time. 
+The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time.
 
 You can search compensation data by 13 parameters, such as company ticker, executive name & position, annual salary, option awards and more.
 
@@ -610,25 +602,26 @@ result_query = execCompApi.get_data(query)
 ```
 
 ### Response Example
+
 ```json
 [
-    {
-        "id": "8e9177e3bcdb30ada8d092c195bd9d63",
-        "cik": "1318605",
-        "ticker": "TSLA",
-        "name": "Andrew Baglino",
-        "position": "SVP, Powertrain and Energy Engineering",
-        "year": 2020,
-        "salary": 283269,
-        "bonus": 0,
-        "stockAwards": 0,
-        "optionAwards": 46261354,
-        "nonEquityIncentiveCompensation": 0,
-        "changeInPensionValueAndDeferredEarnings": 0,
-        "otherCompensation": 0,
-        "total": 46544623
-    }
-    // and many more
+  {
+    "id": "8e9177e3bcdb30ada8d092c195bd9d63",
+    "cik": "1318605",
+    "ticker": "TSLA",
+    "name": "Andrew Baglino",
+    "position": "SVP, Powertrain and Energy Engineering",
+    "year": 2020,
+    "salary": 283269,
+    "bonus": 0,
+    "stockAwards": 0,
+    "optionAwards": 46261354,
+    "nonEquityIncentiveCompensation": 0,
+    "changeInPensionValueAndDeferredEarnings": 0,
+    "otherCompensation": 0,
+    "total": 46544623
+  }
+  // and many more
 ]
 ```
 
@@ -636,11 +629,11 @@ result_query = execCompApi.get_data(query)
 
 # Insider Trading Data API
 
-The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed 
-companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are 
-fully searchable. The insider trading database includes information about the CIK and name of the insider, 
-her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price, 
-the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such 
+The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed
+companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are
+fully searchable. The insider trading database includes information about the CIK and name of the insider,
+her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price,
+the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such
 as the effect of Rule 10b-18 or 10b5-1 stock purchase plans and more. The full list of all data points is available below.
 
 ```python
@@ -658,59 +651,64 @@ print(insider_trades["transactions"])
 > See the documentation for more details: https://sec-api.io/docs/insider-ownership-trading-api
 
 ### Response Example
+
 ```json
 [
-    {
-        "accessionNo": "0000899243-22-028189",
-        "filedAt": "2022-08-09T21:23:00-04:00",
-        "documentType": "4",
-        "periodOfReport": "2022-08-09",
-        "issuer": {"cik": "1318605", "name": "Tesla, Inc.", "tradingSymbol": "TSLA"},
-        "reportingOwner": {
-            "cik": "1494730",
-            "name": "Musk Elon",
-            "address": {
-                "street1": "C/O TESLA, INC.",
-                "street2": "1 TESLA ROAD",
-                "city": "AUSTIN",
-                "state": "TX",
-                "zipCode": "78725"
-            },
-            "relationship": {
-                "isDirector": true,
-                "isOfficer": true,
-                "officerTitle": "CEO",
-                "isTenPercentOwner": true,
-                "isOther": false
-            }
-        },
-        "nonDerivativeTable": {
-            "transactions": [
-                {
-                    "securityTitle": "Common Stock",
-                    "transactionDate": "2022-08-09",
-                    "coding": {
-                        "formType": "4",
-                        "code": "S",
-                        "equitySwapInvolved": false
-                    },
-                    "amounts": {
-                        "shares": 435,
-                        "pricePerShare": 872.469,
-                        "pricePerShareFootnoteId": ["F1"],
-                        "acquiredDisposedCode": "D"
-                    }
-                }
-            ]
-           // and many more
+  {
+    "accessionNo": "0000899243-22-028189",
+    "filedAt": "2022-08-09T21:23:00-04:00",
+    "documentType": "4",
+    "periodOfReport": "2022-08-09",
+    "issuer": {
+      "cik": "1318605",
+      "name": "Tesla, Inc.",
+      "tradingSymbol": "TSLA"
+    },
+    "reportingOwner": {
+      "cik": "1494730",
+      "name": "Musk Elon",
+      "address": {
+        "street1": "C/O TESLA, INC.",
+        "street2": "1 TESLA ROAD",
+        "city": "AUSTIN",
+        "state": "TX",
+        "zipCode": "78725"
+      },
+      "relationship": {
+        "isDirector": true,
+        "isOfficer": true,
+        "officerTitle": "CEO",
+        "isTenPercentOwner": true,
+        "isOther": false
+      }
+    },
+    "nonDerivativeTable": {
+      "transactions": [
+        {
+          "securityTitle": "Common Stock",
+          "transactionDate": "2022-08-09",
+          "coding": {
+            "formType": "4",
+            "code": "S",
+            "equitySwapInvolved": false
+          },
+          "amounts": {
+            "shares": 435,
+            "pricePerShare": 872.469,
+            "pricePerShareFootnoteId": ["F1"],
+            "acquiredDisposedCode": "D"
+          }
         }
+      ]
+      // and many more
     }
+  }
 ]
 ```
 
-# Form N-PORT API 
+# Form N-PORT API
 
-Access and find standardized N-PORT SEC filings. 
+Access and find standardized N-PORT SEC filings.
 
 ```python
 from sec_api import FormNportApi
@@ -731,10 +729,9 @@ print(response["filings"])
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
 
-
 # Form D API
 
-Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by 
+Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by
 hedge funds, type of securities offered and many more.
 
 ```python
@@ -760,13 +757,12 @@ print(response["offerings"])
 
 > See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
 
-
 # Form ADV API
 
-Search the entire ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), 
-individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings 
+Search the entire ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered),
+individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings
 filed by advisory firms and 380,000 individual advisers and is updated daily.
-Search and find ADV filings by any filing property, such as CRD, assets under management, 
+Search and find ADV filings by any filing property, such as CRD, assets under management,
 type of adviser (e.g. broker dealer) and more.
 
 ```python
@@ -803,6 +799,67 @@ print(response["brochures"])
 
 > See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
 
+# Float (Outstanding Shares) API
+
+The Float API returns the number of outstanding shares of any publicly traded company listed on US exchanges. The dataset includes the most recent float as well as historical float data. If a company registered multiple share classes, the API returns the number of shares outstanding of each class.
+
+```python
+from sec_api import FloatApi
+
+floatApi = FloatApi("YOUR_API_KEY")
+
+response = floatApi.get_float(ticker="GOOGL")
+print(response["data"])
+
+response = floatApi.get_float(cik="1318605")
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/outstanding-shares-float-api
+
+### Response Example | Float API
+
+```json
+{
+  "data": [
+    {
+      "tickers": ["GOOGL", "GOOG"],
+      "cik": "1652044",
+      "reportedAt": "2023-02-02T21:23:45-05:00",
+      "periodOfReport": "2022-12-31",
+      "float": {
+        "outstandingShares": [
+          {
+            "period": "2023-01-26",
+            "shareClass": "CommonClassA",
+            "value": 5956000000
+          },
+          {
+            "period": "2023-01-26",
+            "shareClass": "CommonClassB",
+            "value": 883000000
+          },
+          {
+            "period": "2023-01-26",
+            "shareClass": "CapitalClassC",
+            "value": 5968000000
+          }
+        ],
+        "publicFloat": [
+          {
+            "period": "2022-06-30",
+            "shareClass": "",
+            "value": 1256100000000
+          }
+        ]
+      },
+      "sourceFilingAccessionNo": "0001652044-23-000016",
+      "id": "4a29432e1345e30a01e4aa10a2b57b62"
+    }
+    // and more...
+  ]
+}
+```
 
 # Query API Response Format
 
@@ -851,7 +908,6 @@ print(response["brochures"])
     - `classContract` (string) - Class/Contract ID, e.g. C000011787
     - `name` (string) - Name of class/contract entity, e.g. Class L
     - `ticker` (string) - Ticker class/contract entity, e.g. URTLX
-
 
 ## 13F Institutional Ownerships
 

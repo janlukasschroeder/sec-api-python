@@ -8,6 +8,7 @@ from sec_api.index import (
     FormNportApi,
     FormDApi,
     FormAdvApi,
+    FloatApi,
 )
 
 #
@@ -165,6 +166,7 @@ response = formDApi.get_data(
 print(response["offerings"])
 # """
 
+
 #
 # Form ADV API Example
 #
@@ -196,4 +198,18 @@ print(response["filings"])
 response = formAdvApi.get_brochures(149777)
 
 print(response["brochures"])
+# """
+
+
+#
+# Float API Example
+#
+"""
+floatApi = FloatApi("YOUR_API_KEY")
+
+response = floatApi.get_float(ticker="TSLA")
+print(response["data"])
+
+response = floatApi.get_float(cik="1318605")
+print(response["data"])
 # """
