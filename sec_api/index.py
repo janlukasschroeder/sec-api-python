@@ -14,6 +14,7 @@ insider_api_endpoint = "https://api.sec-api.io/insider-trading"
 form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
 form_adv_endpoint = "https://api.sec-api.io/form-adv"
+form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
 float_api_endpoint = "https://api.sec-api.io/float"
 
 
@@ -442,6 +443,32 @@ class FloatApi:
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
             response = requests.get(url)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Form13DGApi:
+    """
+    Base class for Form 13D/13G API
+    """
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.api_endpoint = form_13D_13G_endpoint + "?token=" + api_key
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(self.api_endpoint, json=query)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:

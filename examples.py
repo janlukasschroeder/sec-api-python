@@ -9,6 +9,7 @@ from sec_api.index import (
     FormDApi,
     FormAdvApi,
     FloatApi,
+    Form13DGApi,
 )
 
 #
@@ -212,4 +213,22 @@ print(response["data"])
 
 response = floatApi.get_float(cik="1318605")
 print(response["data"])
+# """
+
+
+#
+# Form 13D/13G API Example
+#
+"""
+form13DGApi = Form13DGApi("YOUR_API_KEY")
+
+query = {
+    "query": {"query_string": {"query": "accessionNo:*"}},
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form13DGApi.get_data(query)
+print(response["filings"])
 # """

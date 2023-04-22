@@ -10,4 +10,5 @@ from sec_api.index import InsiderTradingApi
 from sec_api.index import FormNportApi
 from sec_api.index import FormDApi
 from sec_api.index import FormAdvApi
+from sec_api.index import Form13DGApi
 from sec_api.index import FloatApi

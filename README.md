@@ -1,9 +1,10 @@
 # SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
 
-**sec-api** is a Python package for querying the entire SEC filings corpus in real-time without the need to download filings.
+**sec-api** is a Python package allowing you to search the entire SEC filings corpus and access over 650 terabytes of data.
+
 It includes:
 
-- [Query and Full-Text Search API](#sec-edgar-filings-query-api)
+- [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
 - [Real-Time Stream API](#sec-edgar-filings-real-time-stream-api)
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
@@ -15,6 +16,7 @@ It includes:
 - [Form N-PORT API](#form-n-port-api)
 - [Form D API](#form-d-api)
 - [Form ADV API](#form-adv-api)
+- [Form 13D/13G API](#form-13d-13g-api)
 - [Float (Outstanding Shares) API](#float-outstanding-shares-api)
 
 # Data Coverage
@@ -27,8 +29,6 @@ It includes:
 - 13F holdings API included. Monitor all institutional ownerships in real-time.
 - Every filing is **mapped to a CIK and ticker**
 - All filings in JSON - **no XBRL/XML**
-
-Data source: [sec.gov](https://www.sec.gov/edgar/searchedgar/companysearch.html)
 
 # Overview
 
@@ -798,6 +798,88 @@ print(response["brochures"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
+
+# Form 13D/13G API
+
+The API allows you to easily search and access all SEC Form 13D and Form 13G filings in a standardized JSON format. You can search the database by any form field, such as the CUSIP of the acquired security, name of the security owner, or the aggregate amount owned in percetnage of total shares outstanding.
+
+```python
+from sec_api import Form13DGApi
+
+form13DGApi = Form13DGApi("YOUR_API_KEY")
+
+# find the 50 most recently filed 13D/G filings disclosing 10% of more ownership of any Point72 company.
+query = {
+    "query": {
+        "query_string": {
+            "query": "owners.name:Point72 AND owners.amountAsPercent:[10 TO *]"
+        }
+    },
+    "from": "0",
+    "size": "50",
+    "sort": [ { "filedAt": { "order": "desc"  } } ]
+}
+
+response = form13DGApi.get_data(query)
+
+print(response["filings"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-13d-13g-search-api
+
+### Response Example
+
+```json
+{
+  "total": {
+    "value": 8,
+    "relation": "eq"
+  },
+  "filings": [
+    {
+      "id": "bbb1ef1892bfc12a2e398c903871e3ae",
+      "accessionNo": "0000902664-22-005029",
+      "formType": "SC 13D",
+      "filedAt": "2022-12-05T16:00:20-05:00",
+      "filers": [
+        {
+          "cik": "1813658",
+          "name": "Tempo Automation Holdings, Inc. (Subject)"
+        },
+        {
+          "cik": "1954961",
+          "name": "Point72 Private Investments, LLC (Filed by)"
+        }
+      ],
+      "nameOfIssuer": "Tempo Automation Holdings, Inc.",
+      "titleOfSecurities": "Common Stock, par value $0.0001 per share",
+      "cusip": ["88024M108"],
+      "eventDate": "2022-11-22",
+      "schedule13GFiledPreviously": false,
+      "owners": [
+        {
+          "name": "Point72 Private Investments, LLC",
+          "memberOfGroup": {
+            "a": false,
+            "b": false
+          },
+          "sourceOfFunds": ["OO"],
+          "legalProceedingsDisclosureRequired": false,
+          "place": "Delaware",
+          "soleVotingPower": 0,
+          "sharedVotingPower": 5351000,
+          "soleDispositivePower": 0,
+          "sharedDispositivePower": 5351000,
+          "aggregateAmountOwned": 5351000,
+          "amountExcludesCertainShares": false,
+          "amountAsPercent": 20.3,
+          "typeOfReportingPerson": ["OO"]
+        }
+      ]
+    }
+  ]
+}
+```
 
 # Float (Outstanding Shares) API
 
