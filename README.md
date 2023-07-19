@@ -18,6 +18,7 @@ It includes:
 - [Form ADV API](#form-adv-api)
 - [Form 13D/13G API](#form-13d-13g-api)
 - [Float (Outstanding Shares) API](#float-outstanding-shares-api)
+- [Subsidiary API](#subsidiary-api)
 
 # Data Coverage
 
@@ -763,7 +764,7 @@ Search the entire ADV filing database and find all ADV filings filed by firm adv
 individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings
 filed by advisory firms and 380,000 individual advisers and is updated daily.
 Search and find ADV filings by any filing property, such as CRD, assets under management,
-type of adviser (e.g. broker dealer) and more.
+type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
 
 ```python
 from sec_api import FormAdvApi
@@ -778,8 +779,16 @@ response = formAdvApi.get_firms(
         "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
     }
 )
-
 print(response["filings"])
+
+direct_owners = formAdvApi.get_direct_owners(crd="793")
+print(direct_owners)
+
+indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
+print(indirect_owners)
+
+private_funds = formAdvApi.get_private_funds(crd="793")
+print(private_funds)
 
 response = formAdvApi.get_individuals(
     {
@@ -789,11 +798,9 @@ response = formAdvApi.get_individuals(
         "sort": [{"id": {"order": "desc"}}],
     }
 )
-
 print(response["filings"])
 
 response = formAdvApi.get_brochures(149777)
-
 print(response["brochures"])
 ```
 
@@ -941,6 +948,79 @@ print(response["data"])
     // and more...
   ]
 }
+```
+
+# Subsidiary API
+
+```python
+from sec_api import SubsidiaryApi
+
+subsidiaryApi = SubsidiaryApi("YOUR_API_KEY")
+
+query = {
+    "query": {"query_string": {"query": "ticker:TSLA"}},
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = subsidiaryApi.get_data(query)
+
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/subsidiary-api
+
+### Response Example | Subsidiary API
+
+```json
+{
+  "data": [
+    {
+      "id": "6838a63b29128e116bde65c885282667",
+      "accessionNo": "0000950170-23-001409",
+      "filedAt": "2023-01-30T21:29:15-05:00",
+      "cik": "1318605",
+      "ticker": "TSLA",
+      "companyName": "Tesla, Inc.",
+      "subsidiaries": [
+        {
+          "name": "Alabama Service LLC",
+          "jurisdiction": "Delaware"
+        }
+        {
+          "name": "Alset Warehouse GmbH",
+          "jurisdiction": "Germany"
+        },
+        {
+          "name": "BT Connolly Storage, LLC",
+          "jurisdiction": "Texas"
+        },
+        {
+          "name": "Fotovoltaica GI 4, S. de R.L. de C.V.",
+          "jurisdiction": "Mexico"
+        },
+        // ... more subsidiaries
+    },
+    // ... more historical lists of subsidiaries
+  ]
+}
+```
+
+# Proxy Support
+
+In certain cases, your corporate IT infrastructure may encounter issues with HTTPS requests, leading to SSL certificate errors. To resolve this, HTTP and HTTPS proxies can be passed into all API wrappers as shown in the example below. If you're unsure about which proxies to use, please consult your company's IT administrator.
+
+```python
+from sec_api import QueryApi, RenderApi, ...
+
+proxies = {
+  "http": "http://your-proxy.com",
+  "https": "https://your-proxy.com",
+}
+
+queryApi = QueryApi(api_key="YOUR_API_KEY", proxies=proxies)
+renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
 ```
 
 # Query API Response Format

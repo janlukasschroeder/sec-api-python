@@ -16,6 +16,7 @@ form_d_api_endpoint = "https://api.sec-api.io/form-d"
 form_adv_endpoint = "https://api.sec-api.io/form-adv"
 form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
 float_api_endpoint = "https://api.sec-api.io/float"
+subsidiary_endpoint = "https://api.sec-api.io/subsidiaries"
 
 
 def handle_api_error(response):
@@ -27,16 +28,19 @@ class QueryApi:
     Base class for Query API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = query_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_filings(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -53,16 +57,19 @@ class FullTextSearchApi:
     Base class for Full-Text Search API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = full_text_search_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_filings(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -79,9 +86,10 @@ class RenderApi:
     Base class for Render API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = render_api_endpoint
+        self.proxies = proxies if proxies else {}
 
     def get_filing(self, url, as_pdf=False):
         response = {}
@@ -90,7 +98,7 @@ class RenderApi:
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.get(_url)
+            response = requests.get(_url, proxies=self.proxies)
             if response.status_code == 200:
                 return response.text
             elif response.status_code == 429:
@@ -107,9 +115,10 @@ class XbrlApi:
     Base class for XBRL-to-JSON API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = xbrl_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def xbrl_to_json(self, htm_url="", xbrl_url="", accession_no=""):
         if len(htm_url) == 0 and len(xbrl_url) == 0 and len(accession_no) == 0:
@@ -129,7 +138,7 @@ class XbrlApi:
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.get(_url)
+            response = requests.get(_url, proxies=self.proxies)
 
             if response.status_code == 200:
                 data = json.loads(response.text)
@@ -148,9 +157,10 @@ class ExtractorApi:
     Base class for 10-K/10-Q/8-K item/section extractor API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = extractor_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_section(self, filing_url="", section="1A", return_type="text"):
         if len(filing_url) == 0:
@@ -169,7 +179,7 @@ class ExtractorApi:
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(5):
-            response = requests.get(_url)
+            response = requests.get(_url, proxies=self.proxies)
 
             if response.status_code == 200:
                 return response.text
@@ -190,9 +200,10 @@ class MappingApi:
     cik, ticker, cusip, name, exchange, sector, industry
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = mapping_api_endpoint
+        self.proxies = proxies if proxies else {}
         self.supported_parameters = [
             "cik",
             "ticker",
@@ -220,7 +231,7 @@ class MappingApi:
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.get(_url)
+            response = requests.get(_url, proxies=self.proxies)
 
             if response.status_code == 200:
                 return response.json()
@@ -239,9 +250,10 @@ class ExecCompApi:
     Documentation: https://sec-api.io/docs/executive-compensation-api
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = exec_comp_api_endpoint
+        self.proxies = proxies if proxies else {}
 
     def get_data(self, parameter=""):
         if isinstance(parameter, str):
@@ -263,10 +275,10 @@ class ExecCompApi:
                     + "?token="
                     + self.api_key
                 )
-                response = requests.get(_url)
+                response = requests.get(_url, proxies=self.proxies)
             else:
                 _url = self.api_endpoint + "?token=" + self.api_key
-                response = requests.post(_url, json=parameter)
+                response = requests.post(_url, json=parameter, proxies=self.proxies)
 
             if response.status_code == 200:
                 return response.json()
@@ -284,16 +296,19 @@ class InsiderTradingApi:
     Base class for Insider Trading Data API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = insider_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_data(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -310,16 +325,19 @@ class FormNportApi:
     Base class for Form NPORT API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = form_nport_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_data(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -336,16 +354,19 @@ class FormDApi:
     Base class for Form D API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = form_d_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_data(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -362,20 +383,23 @@ class FormAdvApi:
     Base class for Form ADV API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint_firm = form_adv_endpoint + "/firm" + "?token=" + api_key
         self.api_endpoint_individual = (
             form_adv_endpoint + "/individual" + "?token=" + api_key
         )
         self.api_endpoint_brochures = form_adv_endpoint + "/brochures?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_firms(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint_firm, json=query)
+            response = requests.post(
+                self.api_endpoint_firm, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -386,12 +410,60 @@ class FormAdvApi:
         else:
             handle_api_error(response)
 
+    def get_request_wrapper(self, api_endpoint):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(api_endpoint, proxies=self.proxies)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(x + 1)
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+    def get_direct_owners(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-a-direct-owners/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
+    def get_indirect_owners(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-b-indirect-owners/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
+    def get_private_funds(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-d-7-b-1/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
     def get_individuals(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint_individual, json=query)
+            response = requests.post(
+                self.api_endpoint_individual, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -403,23 +475,10 @@ class FormAdvApi:
             handle_api_error(response)
 
     def get_brochures(self, crd):
-        endpoint = (
+        api_endpoint = (
             form_adv_endpoint + "/brochures/" + str(crd) + "?token=" + self.api_key
         )
-        response = {}
-
-        # use backoff strategy to handle "too many requests" error.
-        for x in range(3):
-            response = requests.get(endpoint)
-            if response.status_code == 200:
-                return response.json()
-            elif response.status_code == 429:
-                # wait 500 * (x + 1) milliseconds and try again
-                time.sleep(0.5 * (x + 1))
-            else:
-                handle_api_error(response)
-        else:
-            handle_api_error(response)
+        return self.get_request_wrapper(api_endpoint)
 
 
 class FloatApi:
@@ -427,9 +486,10 @@ class FloatApi:
     Base class for Float API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = float_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_float(self, ticker="", cik=""):
         if len(ticker) == 0 and len(cik) == 0:
@@ -442,7 +502,7 @@ class FloatApi:
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.get(url)
+            response = requests.get(url, proxies=self.proxies)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
@@ -459,16 +519,48 @@ class Form13DGApi:
     Base class for Form 13D/13G API
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = form_13D_13G_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
 
     def get_data(self, query):
         response = {}
 
         # use backoff strategy to handle "too many requests" error.
         for x in range(3):
-            response = requests.post(self.api_endpoint, json=query)
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class SubsidiaryApi:
+    """
+    Base class for Subsidiary API
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = subsidiary_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:

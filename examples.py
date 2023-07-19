@@ -10,6 +10,7 @@ from sec_api.index import (
     FormAdvApi,
     FloatApi,
     Form13DGApi,
+    SubsidiaryApi,
 )
 
 #
@@ -182,8 +183,18 @@ response = formAdvApi.get_firms(
         "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
     }
 )
-
 print(response["filings"])
+
+
+direct_owners = formAdvApi.get_direct_owners(crd="793")
+print(direct_owners)
+
+indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
+print(indirect_owners)
+
+private_funds = formAdvApi.get_private_funds(crd="793")
+print(private_funds)
+
 
 response = formAdvApi.get_individuals(
     {
@@ -193,11 +204,9 @@ response = formAdvApi.get_individuals(
         "sort": [{"id": {"order": "desc"}}],
     }
 )
-
 print(response["filings"])
 
 response = formAdvApi.get_brochures(149777)
-
 print(response["brochures"])
 # """
 
@@ -231,4 +240,22 @@ query = {
 
 response = form13DGApi.get_data(query)
 print(response["filings"])
+# """
+
+
+#
+# Subsidiary API Example
+#
+"""
+subsidiaryApi = SubsidiaryApi("YOUR_API_KEY")
+
+query = {
+    "query": {"query_string": {"query": "ticker:TSLA"}},
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = subsidiaryApi.get_data(query)
+print(response["data"])
 # """

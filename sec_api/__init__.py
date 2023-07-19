@@ -12,3 +12,4 @@ from sec_api.index import FormDApi
 from sec_api.index import FormAdvApi
 from sec_api.index import Form13DGApi
 from sec_api.index import FloatApi
+from sec_api.index import SubsidiaryApi
