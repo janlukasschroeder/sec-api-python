@@ -20,7 +20,7 @@ It includes:
 - [Float (Outstanding Shares) API](#float-outstanding-shares-api)
 - [Subsidiary API](#subsidiary-api)
 
-# Data Coverage
+## Data Coverage
 
 - All +18 million SEC EDGAR filings dating back to 1993 - 650,000 gigabyte of filings data.
 - **All +150 filing types** are supported, eg 10-Q, 10-K, 4, 8-K, 13-F, S-1, 424B4 and many more.
@@ -31,7 +31,7 @@ It includes:
 - Every filing is **mapped to a CIK and ticker**
 - All filings in JSON - **no XBRL/XML**
 
-# Overview
+## Overview
 
 - The query API gives access to all over 18 million SEC Edgar filings of **over 8000** publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
 - Connect to the real-time stream API to receive new filings as soon as they are published on SEC EDGAR
@@ -40,7 +40,7 @@ It includes:
 
 See the official documentation for more: [sec-api.io/docs](https://sec-api.io/docs)
 
-# Installation
+## Installation
 
 ```bash
 pip install sec-api
@@ -48,9 +48,9 @@ pip install sec-api
 
 Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_KEY` with it.
 
-# SEC EDGAR Filings Query API
+## SEC EDGAR Filings Query API
 
-The query API allows you to search and filter all 18 million filings published on SEC EDGAR.
+The Query API allows you to search and filter all 18 million filings and exhibits published on SEC EDGAR using a large set of search parameters. You can search by ticker, CIK, form type, filing date, SIC code, period of report, series and class IDs, items of 8-K and other filings, and many more. The API returns all filing metadata in a [standardized JSON format](https://sec-api.io/docs/query-api#response-format). Filings are indexed and searchable as soon as they are published on SEC EDGAR. Various examples are provided below, in the [official documentation](https://sec-api.io/docs/query-api), and in our [sandbox](https://sec-api.io/sandbox).
 
 ---
 
@@ -62,9 +62,7 @@ from sec_api import QueryApi
 queryApi = QueryApi(api_key="YOUR_API_KEY")
 
 query = {
-  "query": { "query_string": {
-      "query": "ticker:TSLA AND filedAt:{2020-01-01 TO 2020-12-31} AND formType:\"10-Q\""
-    } },
+  "query": "ticker:TSLA AND filedAt:[2020-01-01 TO 2020-12-31] AND formType:\"10-Q\"",
   "from": "0",
   "size": "10",
   "sort": [{ "filedAt": { "order": "desc" } }]
@@ -75,13 +73,11 @@ filings = queryApi.get_filings(query)
 print(filings)
 ```
 
-Fetch most recent 8-Ks with item 9.01
+Fetch most recent 8-Ks with Item 9.01 "Financial Statements and Exhibits".
 
 ```python
 query = {
-  "query": { "query_string": {
-      "query": "formType:\"8-K\" AND description:\"9.01\""
-    } },
+  "query": "formType:\"8-K\" AND items:\"9.01\"",
   "from": "0",
   "size": "10",
   "sort": [{ "filedAt": { "order": "desc" } }]
@@ -90,15 +86,13 @@ query = {
 filings = queryApi.get_filings(query)
 ```
 
-## 13F Institutional Investor Database
+### 13F Institutional Investor Database
 
-Fetch most recent 13F filings that hold Tesla
+Fetch most recent 13F filings that hold Tesla.
 
 ```python
 query = {
-  "query": { "query_string": {
-      "query": "formType:\"13F\" AND holdings.cusip:88160R101"
-    } },
+  "query": "formType:\"13F\" AND holdings.ticker:TSLA",
   "from": "0",
   "size": "10",
   "sort": [{ "filedAt": { "order": "desc" } }]
@@ -109,39 +103,51 @@ filings = queryApi.get_filings(query)
 
 > See the documentation for more details: https://sec-api.io/docs/query-api
 
-# SEC EDGAR Filings Real-Time Stream API
+## SEC EDGAR Filings Real-Time Stream API
 
-The stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR.
+The Stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR via WebSockets.
 A new filing is sent to your connected client as soon as it is published.
 
 ---
 
-Install the `socketio` client:
+Install the `websockets` client:
 
 ```bash
-pip install python-engineio==3.14.2 python-socketio[client]==4.6.0
+pip install websockets
 ```
 
 Run the example script below. Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_KEY` with it.
 
 ```python
-import socketio
+import asyncio
+import websockets
+import json
 
-sio = socketio.Client()
+API_KEY = "YOUR_API_KEY" # Replace this with your actual API key
+SERVER_URL = "wss://stream.sec-api.io"
+WS_ENDPOINT = SERVER_URL + "?apiKey=" + API_KEY
 
-@sio.on("connect", namespace="/all-filings")
-def on_connect():
-    print("Connected to https://api.sec-api.io:3334/all-filings")
+async def websocket_client():
+    try:
+        async with websockets.connect(WS_ENDPOINT) as websocket:
+            print("✅ Connected to:", SERVER_URL)
 
-@sio.on("filing", namespace="/all-filings")
-def on_filings(filing):
-    print(filing)
+            while True:
+                message = await websocket.recv()
+                filings = json.loads(message)
+                for f in filings:
+                    print(f["accessionNo"], f["formType"], f["filedAt"], f["cik"])
 
-sio.connect("https://api.sec-api.io:3334?apiKey=YOUR_API_KEY", namespaces=["/all-filings"], transports=["websocket"])
-sio.wait()
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
+asyncio.run(websocket_client())
 ```
 
-# Full-Text Search API
+> See the documentation for more details: https://sec-api.io/docs/stream-api
+
+## Full-Text Search API
 
 Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
 
@@ -168,7 +174,7 @@ print(filings)
 
 > See the documentation for more details: https://sec-api.io/docs/full-text-search-api
 
-# XBRL-To-JSON Converter API
+## XBRL-To-JSON Converter API
 
 Parse and standardize any XBRL and convert it to JSON or pandas dataframes. Extract financial statements and meta data from 10-K and 10-Q filings.
 
@@ -189,7 +195,7 @@ All financial statements are accessible and standardized:
 
 Variants such as `ConsolidatedStatementsofOperations` or `ConsolidatedStatementsOfLossIncome` are automatically standardized to their root name, e.g. `StatementsOfIncome`.
 
-## Income Statement - Example Item
+### Income Statement - Example Item
 
 ```json
 {
@@ -218,7 +224,7 @@ Variants such as `ConsolidatedStatementsofOperations` or `ConsolidatedStatements
 }
 ```
 
-## Usage
+### Usage
 
 There are 3 ways to convert XBRL to JSON:
 
@@ -252,7 +258,7 @@ xbrl_json = xbrlApi.xbrl_to_json(
 xbrl_json = xbrlApi.xbrl_to_json(accession_no="0001564590-21-004599")
 ```
 
-## Example Response
+### Example Response
 
 Note: response is shortened.
 
@@ -356,7 +362,7 @@ Note: response is shortened.
 
 > See the documentation for more details: https://sec-api.io/docs/xbrl-to-json-converter-api
 
-# 10-K/10-Q/8-K Section Extractor API
+## 10-K/10-Q/8-K Section Extractor API
 
 The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. The extracted section is cleaned and standardized - in raw text or in standardized HTML. You can programmatically extract one or multiple sections from any 10-Q, 10-K and 8-K filing.
 
@@ -365,6 +371,7 @@ The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. T
 - 1 - Business
 - 1A - Risk Factors
 - 1B - Unresolved Staff Comments
+- 1C - Cybersecurity (introduced in 2023)
 - 2 - Properties
 - 3 - Legal Proceedings
 - 4 - Mine Safety Disclosures
@@ -407,6 +414,7 @@ Part 2:
 - 1.02: Termination of a Material Definitive Agreement
 - 1.03: Bankruptcy or Receivership
 - 1.04: Mine Safety - Reporting of Shutdowns and Patterns of Violations
+- 1.05: Material Cybersecurity Incidents (introduced in 2023)
 - 2.01: Completion of Acquisition or Disposition of Assets
 - 2.02: Results of Operations and Financial Condition
 - 2.03: Creation of a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement of a Registrant
@@ -430,8 +438,6 @@ Part 2:
 - 6.02: Change of Servicer or Trustee
 - 6.03: Change in Credit Enhancement or Other External Support
 - 6.04: Failure to Make a Required Distribution
-- 6.04: Failure to Make a Required Distribution
-- 6.04: Failure to Make a Required Distribution
 - 6.05: Securities Act Updating Disclosure
 - 6.06: Static Pool
 - 6.10: Alternative Filings of Asset-Backed Issuers
@@ -440,7 +446,7 @@ Part 2:
 - 9.01: Financial Statements and Exhibits
 - Signature
 
-## Usage
+### Usage
 
 ```python
 from sec_api import ExtractorApi
@@ -479,7 +485,7 @@ extracted_section_8k = extractorApi.get_section(filing_url_8k, "1-1", "text")
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
 
-# Filing Render & Download API
+## Filing Render & Download API
 
 Used to download any filing or exhibit. You can process the downloaded filing in memory or save the filing to your hard drive.
 
@@ -497,7 +503,7 @@ print(filing)
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
-# CUSIP/CIK/Ticker Mapping API
+## CUSIP/CIK/Ticker Mapping API
 
 Resolve a CUSIP, CIK, ticker symbol or company name to a set of standardized company details. Listing companies by exchange, sector and industry is also supported.
 
@@ -533,7 +539,7 @@ A company object includes the following properties:
 
 Response type: `JSON`
 
-## Usage
+### Usage
 
 ```python
 from sec_api import MappingApi
@@ -546,7 +552,7 @@ result3 = mappingApi.resolve("cusip", "88160R101")
 result4 = mappingApi.resolve("exchange", "NASDAQ")
 ```
 
-### Response Example
+#### Response Example
 
 ```json
 [
@@ -574,7 +580,7 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 
 > See the documentation for more details: https://sec-api.io/docs/mapping-api
 
-# Executive Compensation Data API
+## Executive Compensation Data API
 
 The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time.
 
@@ -594,7 +600,7 @@ result_cik = execCompApi.get_data("789019")
 # List all exec compensations of CIK 70858 for year 2020 and 2019
 # Sort result by year first, by name second
 query = {
-    "query": {"query_string": {"query": "cik:70858 AND (year:2020 OR year:2019)"}},
+    "query": "cik:70858 AND (year:2020 OR year:2019)",
     "from": "0",
     "size": "200",
     "sort": [{"year": {"order": "desc"}}, {"name.keyword": {"order": "asc"}}],
@@ -628,7 +634,7 @@ result_query = execCompApi.get_data(query)
 
 > See the documentation for more details: https://sec-api.io/docs/executive-compensation-api
 
-# Insider Trading Data API
+## Insider Trading Data API
 
 The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed
 companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are
@@ -643,7 +649,7 @@ from sec_api import InsiderTradingApi
 insiderTradingApi = InsiderTradingApi("YOUR_API_KEY")
 
 insider_trades = insiderTradingApi.get_data({
-  "query": {"query_string": {"query": "issuer.tradingSymbol:TSLA"}}
+  "query": "issuer.tradingSymbol:TSLA"
 })
 
 print(insider_trades["transactions"])
@@ -707,7 +713,7 @@ print(insider_trades["transactions"])
 ]
 ```
 
-# Form N-PORT API
+## Form N-PORT API
 
 Access and find standardized N-PORT SEC filings.
 
@@ -718,7 +724,7 @@ nportApi = FormNportApi("YOUR_API_KEY")
 
 response = nportApi.get_data(
     {
-        "query": {"query_string": {"query": "fundInfo.totAssets:[100000000 TO *]"}},
+        "query": "fundInfo.totAssets:[100000000 TO *]",
         "from": "0",
         "size": "10",
         "sort": [{"filedAt": {"order": "desc"}}],
@@ -730,7 +736,7 @@ print(response["filings"])
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
 
-# Form D API
+## Form D API
 
 Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by
 hedge funds, type of securities offered and many more.
@@ -742,11 +748,7 @@ formDApi = FormDApi("YOUR_API_KEY")
 
 response = formDApi.get_data(
     {
-        "query": {
-            "query_string": {
-                "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]"
-            }
-        },
+        "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]",
         "from": "0",
         "size": "10",
         "sort": [{"filedAt": {"order": "desc"}}],
@@ -758,7 +760,7 @@ print(response["offerings"])
 
 > See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
 
-# Form ADV API
+## Form ADV API
 
 Search the entire ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered),
 individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings
@@ -773,7 +775,7 @@ formAdvApi = FormAdvApi("YOUR_API_KEY")
 
 response = formAdvApi.get_firms(
     {
-        "query": {"query_string": {"query": "Info.FirmCrdNb:361"}},
+        "query": "Info.FirmCrdNb:361",
         "from": "0",
         "size": "10",
         "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
@@ -792,7 +794,7 @@ print(private_funds)
 
 response = formAdvApi.get_individuals(
     {
-        "query": {"query_string": {"query": "CrntEmps.CrntEmp.orgPK:149777"}},
+        "query": "CrntEmps.CrntEmp.orgPK:149777",
         "from": "0",
         "size": "10",
         "sort": [{"id": {"order": "desc"}}],
@@ -806,7 +808,7 @@ print(response["brochures"])
 
 > See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
 
-# Form 13D/13G API
+## Form 13D/13G API
 
 The API allows you to easily search and access all SEC Form 13D and Form 13G filings in a standardized JSON format. You can search the database by any form field, such as the CUSIP of the acquired security, name of the security owner, or the aggregate amount owned in percetnage of total shares outstanding.
 
@@ -817,11 +819,7 @@ form13DGApi = Form13DGApi("YOUR_API_KEY")
 
 # find the 50 most recently filed 13D/G filings disclosing 10% of more ownership of any Point72 company.
 query = {
-    "query": {
-        "query_string": {
-            "query": "owners.name:Point72 AND owners.amountAsPercent:[10 TO *]"
-        }
-    },
+    "query": "owners.name:Point72 AND owners.amountAsPercent:[10 TO *]",
     "from": "0",
     "size": "50",
     "sort": [ { "filedAt": { "order": "desc"  } } ]
@@ -888,7 +886,7 @@ print(response["filings"])
 }
 ```
 
-# Float (Outstanding Shares) API
+## Float (Outstanding Shares) API
 
 The Float API returns the number of outstanding shares of any publicly traded company listed on US exchanges. The dataset includes the most recent float as well as historical float data. If a company registered multiple share classes, the API returns the number of shares outstanding of each class.
 
@@ -950,7 +948,7 @@ print(response["data"])
 }
 ```
 
-# Subsidiary API
+## Subsidiary API
 
 ```python
 from sec_api import SubsidiaryApi
@@ -958,7 +956,7 @@ from sec_api import SubsidiaryApi
 subsidiaryApi = SubsidiaryApi("YOUR_API_KEY")
 
 query = {
-    "query": {"query_string": {"query": "ticker:TSLA"}},
+    "query": "ticker:TSLA",
     "from": "0",
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
@@ -1001,13 +999,14 @@ print(response["data"])
           "jurisdiction": "Mexico"
         },
         // ... more subsidiaries
+      ]
     },
     // ... more historical lists of subsidiaries
   ]
 }
 ```
 
-# Proxy Support
+## Proxy Support
 
 In certain cases, your corporate IT infrastructure may encounter issues with HTTPS requests, leading to SSL certificate errors. To resolve this, HTTP and HTTPS proxies can be passed into all API wrappers as shown in the example below. If you're unsure about which proxies to use, please consult your company's IT administrator.
 
@@ -1023,7 +1022,7 @@ queryApi = QueryApi(api_key="YOUR_API_KEY", proxies=proxies)
 renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
 ```
 
-# Query API Response Format
+## Query API Response Format
 
 - `accessionNo` (string) - Accession number of filing, e.g. 0000028917-20-000033
 - `cik` (string) - CIK of the filing issuer. Important: trailing `0` are removed.
@@ -1071,7 +1070,7 @@ renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
     - `name` (string) - Name of class/contract entity, e.g. Class L
     - `ticker` (string) - Ticker class/contract entity, e.g. URTLX
 
-## 13F Institutional Ownerships
+### 13F Institutional Ownerships
 
 13F filings report institutional ownerships. Each 13F filing has an attribute `holdings` (array). An array item in holdings represents one holding and has the following attributes:
 
@@ -1090,7 +1089,7 @@ renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
   - `Shared` (integer) - Shared, e.g. 345
   - `None` (integer) - None, e.g. 345
 
-## Query API Example JSON Response
+### Query API Example JSON Response
 
 ```json
 {
@@ -1215,7 +1214,7 @@ renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
 }
 ```
 
-# Contact
+## Contact
 
 Let us know how we can improve the library or if you have any feature
 suggestions. We're happy to implement them.
