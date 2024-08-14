@@ -3,6 +3,7 @@ from sec_api.index import (
     XbrlApi,
     ExtractorApi,
     MappingApi,
+    DirectorsBoardMembersApi,
     ExecCompApi,
     InsiderTradingApi,
     FormNportApi,
@@ -10,7 +11,10 @@ from sec_api.index import (
     FormAdvApi,
     FloatApi,
     Form13DGApi,
+    Form_S1_424B4_Api,
     SubsidiaryApi,
+    AaerApi,
+    SroFilingsApi,
 )
 
 #
@@ -82,6 +86,24 @@ print(result)
 
 
 #
+# Directors & Board Members API Example
+#
+"""
+directorsBoardMembersApi = DirectorsBoardMembersApi("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:AMZN",
+    "from": 0,
+    "size": 50,
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = directorsBoardMembersApi.get_data(query)
+print(response["data"])
+# """
+
+
+#
 # Executive Compensation Data API Example
 #
 """
@@ -118,7 +140,7 @@ insiderTradingApi = InsiderTradingApi("YOUR_API_KEY")
 
 insider_trades = insiderTradingApi.get_data(
     {
-        "query": {"query_string": {"query": "issuer.tradingSymbol:TSLA"}},
+        "query": "issuer.tradingSymbol:TSLA",
         "from": "0",
         "size": "50",
         "sort": [{"filedAt": {"order": "desc"}}],
@@ -136,7 +158,7 @@ nportApi = FormNportApi("YOUR_API_KEY")
 
 response = nportApi.get_data(
     {
-        "query": {"query_string": {"query": "fundInfo.totAssets:[100000000 TO *]"}},
+        "query": "fundInfo.totAssets:[100000000 TO *]",
         "from": "0",
         "size": "2",
         "sort": [{"filedAt": {"order": "desc"}}],
@@ -154,11 +176,7 @@ formDApi = FormDApi("YOUR_API_KEY")
 
 response = formDApi.get_data(
     {
-        "query": {
-            "query_string": {
-                "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]"
-            }
-        },
+        "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]",
         "from": "0",
         "size": "10",
         "sort": [{"filedAt": {"order": "desc"}}],
@@ -177,7 +195,7 @@ formAdvApi = FormAdvApi("YOUR_API_KEY")
 
 response = formAdvApi.get_firms(
     {
-        "query": {"query_string": {"query": "Info.FirmCrdNb:361"}},
+        "query": "Info.FirmCrdNb:361",
         "from": "0",
         "size": "10",
         "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
@@ -198,7 +216,7 @@ print(private_funds)
 
 response = formAdvApi.get_individuals(
     {
-        "query": {"query_string": {"query": "CrntEmps.CrntEmp.orgPK:149777"}},
+        "query": "CrntEmps.CrntEmp.orgPK:149777",
         "from": "0",
         "size": "10",
         "sort": [{"id": {"order": "desc"}}],
@@ -232,7 +250,7 @@ print(response["data"])
 form13DGApi = Form13DGApi("YOUR_API_KEY")
 
 query = {
-    "query": {"query_string": {"query": "accessionNo:*"}},
+    "query": "accessionNo:*",
     "from": "0",
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
@@ -244,18 +262,72 @@ print(response["filings"])
 
 
 #
+# Form S-1/424B4 API Example
+#
+"""
+form_s1_424B4_api = Form_S1_424B4_Api("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:V",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form_s1_424B4_api.get_data(query)
+print(response["data"])
+# """
+
+
+#
 # Subsidiary API Example
 #
 """
 subsidiaryApi = SubsidiaryApi("YOUR_API_KEY")
 
 query = {
-    "query": {"query_string": {"query": "ticker:TSLA"}},
+    "query": "ticker:TSLA",
     "from": "0",
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
 }
 
 response = subsidiaryApi.get_data(query)
+print(response["data"])
+# """
+
+
+#
+# AAER API Example
+#
+"""
+aaerApi = AaerApi("YOUR_API_KEY")
+
+query = {
+    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"dateTime": {"order": "desc"}}],
+}
+
+response = aaerApi.get_data(query)
+print(response["data"])
+# """
+
+
+#
+# SRO Filings API Example
+#
+"""
+sroFilingsApi = SroFilingsApi("YOUR_API_KEY")
+
+query = {
+    "query": "sro:NASDAQ",
+    "from": "0",
+    "size": "10",
+    "sort": [{"issueDate": {"order": "desc"}}],
+}
+
+response = sroFilingsApi.get_data(query)
 print(response["data"])
 # """

@@ -1,41 +1,62 @@
 # SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
 
-**sec-api** is a Python package allowing you to search the entire SEC filings corpus and access over 650 terabytes of data.
+**sec-api** is a Python package allowing you to search the entire SEC filings corpus and access over 650 terabytes of data. It includes:
 
-It includes:
+**General APIs:**
 
 - [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
-- [Real-Time Stream API](#sec-edgar-filings-real-time-stream-api)
+- [Real-Time Filing Stream API](#sec-edgar-filings-real-time-stream-api)
+- [Filing Download & PDF Render API](#filing-render--download-api)
+
+**Converter & Extractor APIs:**
+
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
-- [Filing Download & PDF Render API](#filing-render--download-api)
+
+**Directors, Executives and Board Members:**
+
+- [Directors & Board Members API](#directors--board-members-data-api)
 - [Executive Compensation Data API](#executive-compensation-data-api)
-- [Insider Trading Data API](#insider-trading-data-api)
-- [13F Institutional Investor Database](#13f-institutional-investor-database)
+
+**Ownership Data APIs:**
+
+- [Form 3/4/5 API - Insider Trading](#insider-trading-data-api)
+- [Form 13F API - Institutional Investment Manager Holdings](#13f-institutional-investor-database)
+- [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
+- [Form N-PORT API - Mutual Fund Holdings](#form-n-port-api)
+
+**Security Offerings APIs:**
+
+- [Form S-1/424B4 API - Registration Statements and Prospectuses (IPOs, Debt/Warrants/... Offerings)](#form-s-1424b4-api)
+- [Form D API - Private Security Offerings](#form-d-api)
+
+**Investment Advisers:**
+
+- [Form ADV API - Investment Advisors (Firm & Indvl. Advisors, Brochures, Schedules)](#form-adv-api)
+
+**Other APIs:**
+
 - [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
-- [Form N-PORT API](#form-n-port-api)
-- [Form D API](#form-d-api)
-- [Form ADV API](#form-adv-api)
-- [Form 13D/13G API](#form-13d-13g-api)
 - [Float (Outstanding Shares) API](#float-outstanding-shares-api)
-- [Subsidiary API](#subsidiary-api)
+- [Company Subsidiary API](#subsidiary-api)
+- [AAER Database API - Accounting and Auditing Enforcement Releases](#aaer-database-api)
+- [SRO Filings Database API](#sro-filings-database-api)
 
 ## Data Coverage
 
-- All +18 million SEC EDGAR filings dating back to 1993 - 650,000 gigabyte of filings data.
-- **All +150 filing types** are supported, eg 10-Q, 10-K, 4, 8-K, 13-F, S-1, 424B4 and many more.
-  [See the list of supported form types here.](https://sec-api.io/list-of-sec-filing-types)
-- Newly published filings are accessible in real-time
-- XBRL-to-JSON converter and parser API. Extract standardized financial statements from any 10-K and 10-Q filing.
-- 13F holdings API included. Monitor all institutional ownerships in real-time.
-- Every filing is **mapped to a CIK and ticker**
-- All filings in JSON - **no XBRL/XML**
+- Access to over 18 million SEC EDGAR filings from 1993 to the present, encompassing 650,000+ gigabytes of data.
+- Supports all 150+ filing types, including 10-Q, 10-K, Form 4, 8-K, 13-F, S-1, 424B4, and many others. [See the full list of supported form types here.](https://sec-api.io/list-of-sec-filing-types)
+- Real-time access to newly published filings.
+- Includes XBRL-to-JSON converter and parser APIs for extracting standardized financial statements from any 10-K or 10-Q filing.
+- 13F Holdings API provided, allowing real-time monitoring of institutional ownership.
+- Every filing is linked to its corresponding CIK and ticker.
+- All filings available in JSON format — no need for XBRL/XML parsing.
 
 ## Overview
 
-- The query API gives access to all over 18 million SEC Edgar filings of **over 8000** publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
+- The Query API gives access to all over 18 million SEC EDGAR filings of over 8,000 publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
 - Connect to the real-time stream API to receive new filings as soon as they are published on SEC EDGAR
-- The full-text search API allows you to search the full text of all filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
+- The Full-Text Search API allows you to search the full text of all filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
 - Free API key available on [sec-api.io](https://sec-api.io)
 
 See the official documentation for more: [sec-api.io/docs](https://sec-api.io/docs)
@@ -105,8 +126,7 @@ filings = queryApi.get_filings(query)
 
 ## SEC EDGAR Filings Real-Time Stream API
 
-The Stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR via WebSockets.
-A new filing is sent to your connected client as soon as it is published.
+The Stream API provides a live stream (aka feed) of newly published filings on SEC EDGAR via WebSockets. A new filing is sent to your connected client as soon as it is published.
 
 ---
 
@@ -176,7 +196,7 @@ print(filings)
 
 ## XBRL-To-JSON Converter API
 
-Parse and standardize any XBRL and convert it to JSON or pandas dataframes. Extract financial statements and meta data from 10-K and 10-Q filings.
+Parse and standardize any XBRL and convert it to JSON or pandas dataframes. Extract financial statements and metadata from 10-K, 10-Q and any other SEC filing supporting XBRL.
 
 The entire US GAAP taxonomy is fully supported. All XBRL items are fully converted into JSON, including `us-gaap`, `dei` and custom items. XBRL facts are automatically mapped to their respective context including period instants and date ranges.
 
@@ -580,6 +600,28 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 
 > See the documentation for more details: https://sec-api.io/docs/mapping-api
 
+## Directors & Board Members Data API
+
+Access and search the entire database of all directors and board members of all publicly listed companies on US stock exchanges. The database includes information about the CIK, ticker and company name the director is associated with, the name of the director, her/his age, position, director class, date of first election, independence status, committee memberships as well as qualifications and experiences.
+
+```python
+from sec_api import DirectorsBoardMembersApi
+
+directorsBoardMembersApi = DirectorsBoardMembersApi("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:AMZN",
+    "from": 0,
+    "size": 50,
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = directorsBoardMembersApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/directors-and-board-members-data-api
+
 ## Executive Compensation Data API
 
 The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time.
@@ -636,12 +678,7 @@ result_query = execCompApi.get_data(query)
 
 ## Insider Trading Data API
 
-The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed
-companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are
-fully searchable. The insider trading database includes information about the CIK and name of the insider,
-her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price,
-the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such
-as the effect of Rule 10b-18 or 10b5-1 stock purchase plans and more. The full list of all data points is available below.
+The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are fully searchable. The insider trading database includes information about the CIK and name of the insider, her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price, the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such as the effect of Rule 10b-18 or 10b5-1 stock purchase plans and more. The full list of all data points is available below.
 
 ```python
 from sec_api import InsiderTradingApi
@@ -736,10 +773,29 @@ print(response["filings"])
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
 
+## Form S-1/424B4 API
+
+Access and find structured and standardized data extracted from S-1, F-1, and S-11 registration statements as well as 424B4 prospectus filings. The JSON data includes public offering prices, underwriting discounts, proceeds before expenses, security types being offered, underwriters (lead and co-managers), law firms, auditors, employee counts and management information (name, age, position).
+
+```python
+form_s1_424B4_api = Form_S1_424B4_Api("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:V",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form_s1_424B4_api.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-s1-424b4-data-search-api
+
 ## Form D API
 
-Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by
-hedge funds, type of securities offered and many more.
+Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by hedge funds, type of securities offered and many more.
 
 ```python
 from sec_api import FormDApi
@@ -762,11 +818,7 @@ print(response["offerings"])
 
 ## Form ADV API
 
-Search the entire ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered),
-individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings
-filed by advisory firms and 380,000 individual advisers and is updated daily.
-Search and find ADV filings by any filing property, such as CRD, assets under management,
-type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
+Search the entire Form ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings filed by advisory firms and 380,000 individual advisers and is updated daily. Search and find ADV filings by any filing property, such as CRD, assets under management, type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
 
 ```python
 from sec_api import FormAdvApi
@@ -1006,6 +1058,50 @@ print(response["data"])
 }
 ```
 
+## AAER Database API
+
+Access and search the Accounting and Auditing Enforcement Releases (AAER) database. The database includes all AAERs filed from 1997 to present.
+
+```python
+from sec_api import AaerApi
+
+aaerApi = AaerApi("YOUR_API_KEY")
+
+query = {
+    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"dateTime": {"order": "desc"}}],
+}
+
+response = aaerApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/aaer-database-api
+
+## SRO Filings Database API
+
+Access and search all SRO filings published from 1995 to present. The database includes more than 30,000 SRO filings from all types of organizations, including National Securities Exchanges (NYSE, NASDAQ, CBOE, etc.), Joint Industry Plans, FINRA, Futures Exchanges (CME, CBOT, etc.), and more.
+
+```python
+from sec_api import SroFilingsApi
+
+sroFilingsApi = SroFilingsApi("YOUR_API_KEY")
+
+query = {
+    "query": "sro:NASDAQ",
+    "from": "0",
+    "size": "10",
+    "sort": [{"issueDate": {"order": "desc"}}],
+}
+
+response = sroFilingsApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sro-filings-database-api
+
 ## Proxy Support
 
 In certain cases, your corporate IT infrastructure may encounter issues with HTTPS requests, leading to SSL certificate errors. To resolve this, HTTP and HTTPS proxies can be passed into all API wrappers as shown in the example below. If you're unsure about which proxies to use, please consult your company's IT administrator.
@@ -1038,6 +1134,10 @@ renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
 - `filedAt` (string) - The date (format: YYYY-MM-DD HH:mm:SS TZ) the filing was filed, eg 2019-12-06T14:41:26-05:00.
 - `periodOfReport` (string, if reported) - Period of report, e.g. 2021-06-08
 - `effectivenessDate` (string, if reported) - Effectiveness date, e.g. 2021-06-08
+- `registrationForm` (string, if reported) - Registration form as reported on EFFECT forms, e.g. S-1
+- `referenceAccessionNo` (string, if reported) - Reference accession number as reported on EFFECT forms, e.g. 0001213900-22-001446
+- `items` (array of strings, if reported) - Items represents an array of item strings as reported on form 8-K, 8-K/A, D, D/A, ABS-15G, ABS-15G/A, 1-U, 1-U/A. For example: `["Item 3.02: Unregistered Sales of Equity Securities", "Item 9.01: Financial Statements and Exhibits"]`
+- `groupMembers` (array, if reported) - Group members represents an array of member strings as reported on SC 13G, SC 13G/A, SC 13D, SC 13D/A filings, e.g. `[ "ALEC N. LITOWITZMAGNETAR CAPITAL PARTNERS LPSUPERNOVA MANAGEMENT LLC" ]`
 - `id` (string) - Unique ID of the filing.
 - `entities` (array) - A list of all entities referred to in the filing. The first item in the array always represents the filing issuer. Each array element is an object with the following keys:
   - `companyName` (string) - Company name of the entity, e.g. DILLARD'S, INC. (Issuer)
@@ -1216,7 +1316,6 @@ renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
 
 ## Contact
 
-Let us know how we can improve the library or if you have any feature
-suggestions. We're happy to implement them.
+Let us know how we can improve the library or if you have any feature suggestions. We're happy to implement them.
 
 support@sec-api.io
