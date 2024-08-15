@@ -112,6 +112,10 @@ filings = queryApi.get_filings(query)
 Fetch most recent 13F filings that hold Tesla.
 
 ```python
+from sec_api import QueryApi
+
+queryApi = QueryApi(api_key="YOUR_API_KEY")
+
 query = {
   "query": "formType:\"13F\" AND holdings.ticker:TSLA",
   "from": "0",
@@ -778,6 +782,8 @@ print(response["filings"])
 Access and find structured and standardized data extracted from S-1, F-1, and S-11 registration statements as well as 424B4 prospectus filings. The JSON data includes public offering prices, underwriting discounts, proceeds before expenses, security types being offered, underwriters (lead and co-managers), law firms, auditors, employee counts and management information (name, age, position).
 
 ```python
+from sec_api import Form_S1_424B4_Api
+
 form_s1_424B4_api = Form_S1_424B4_Api("YOUR_API_KEY")
 
 query = {
