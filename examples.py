@@ -26,7 +26,8 @@ renderApi = RenderApi("YOUR_API_KEY")
 
 # 10-K HTM File URL example
 filing_data = renderApi.get_filing(
-    url="https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+    # url="https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+    url="https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
 )
 
 print(filing_data)
@@ -340,8 +341,8 @@ print(response["data"])
 item_4_02_api = Item_4_02_Api("YOUR_API_KEY")
 
 query = {
-    "query": "ticker:AEON",
-    "from": "0",
+    "query": "filedAt:[2010-01-01 TO 2019-12-31]",
+    "from": "0",  # increase by 50 to fetch the next 50 results, e.g. 50 (=page 2), 100 (=page 3), 150 (=page 4), ...
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
 }

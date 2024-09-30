@@ -107,7 +107,9 @@ class RenderApi:
 
     def get_filing(self, url, as_pdf=False):
         response = {}
-        filename = re.sub(r"https://www.sec.gov/Archives/edgar/data", "", url)
+        # remove "ix?doc=/" from URL
+        filename = re.sub(r"ix\?doc=/", "", url)
+        filename = re.sub(r"https://www.sec.gov/Archives/edgar/data", "", filename)
         _url = self.api_endpoint + filename + "?token=" + self.api_key
 
         # use backoff strategy to handle "too many requests" error.
