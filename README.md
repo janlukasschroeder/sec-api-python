@@ -816,7 +816,7 @@ from sec_api import Item_4_02_Api
 item_4_02_api = Item_4_02_Api("YOUR_API_KEY")
 
 query = {
-    "query": "ticker:*AEON*",
+    "query": "ticker:*",
     "from": "0",
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
