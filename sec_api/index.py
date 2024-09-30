@@ -8,21 +8,29 @@ full_text_search_api_endpoint = "https://api.sec-api.io/full-text-search"
 render_api_endpoint = "https://archive.sec-api.io"
 xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
 extractor_api_endpoint = "https://api.sec-api.io/extractor"
-mapping_api_endpoint = "https://api.sec-api.io/mapping"
+#
+form_adv_endpoint = "https://api.sec-api.io/form-adv"
+#
+insider_api_endpoint = "https://api.sec-api.io/insider-trading"
+form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
+form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
+#
+form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
+form_d_api_endpoint = "https://api.sec-api.io/form-d"
+#
+form_8K_item_4_02_api_endpoint = "https://api.sec-api.io/form-8k"
+#
 exec_comp_api_endpoint = "https://api.sec-api.io/compensation"
 directors_board_members_api_endpoint = (
     "https://api.sec-api.io/directors-and-board-members"
 )
-insider_api_endpoint = "https://api.sec-api.io/insider-trading"
-form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
-form_d_api_endpoint = "https://api.sec-api.io/form-d"
-form_adv_endpoint = "https://api.sec-api.io/form-adv"
-form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
-form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
 float_api_endpoint = "https://api.sec-api.io/float"
 subsidiary_endpoint = "https://api.sec-api.io/subsidiaries"
+#
 aaer_search_endpoint = "https://api.sec-api.io/aaers"
 sro_search_endpoint = "https://api.sec-api.io/sro"
+#
+mapping_api_endpoint = "https://api.sec-api.io/mapping"
 
 
 def handle_api_error(response):
@@ -685,6 +693,35 @@ class SroFilingsApi:
         for x in range(3):
             response = requests.post(
                 self.api_search_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Item_4_02_Api:
+    """
+    Base class for Form 8-K Item 4.02 API
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_8K_item_4_02_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
             )
             if response.status_code == 200:
                 return response.json()

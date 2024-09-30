@@ -1,8 +1,10 @@
 # SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
 
-**sec-api** is a Python package allowing you to search the entire SEC filings corpus and access over 650 terabytes of data. It includes:
+**sec-api** is a Python package allowing you to search the entire SEC EDGAR filings corpus and access petabytes of regulatory information published by public and private companies, insiders such as directors and board members, hedge and mutual funds, financial advisors, business development companies, and more.
 
-**General APIs:**
+It includes:
+
+**EDGAR Filing Search & Download**
 
 - [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
 - [Real-Time Filing Stream API](#sec-edgar-filings-real-time-stream-api)
@@ -13,15 +15,10 @@
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
 
-**Directors, Executives and Board Members:**
-
-- [Directors & Board Members API](#directors--board-members-data-api)
-- [Executive Compensation Data API](#executive-compensation-data-api)
-
 **Ownership Data APIs:**
 
 - [Form 3/4/5 API - Insider Trading](#insider-trading-data-api)
-- [Form 13F API - Institutional Investment Manager Holdings](#13f-institutional-investor-database)
+- [Form 13F API - Institutional Investment Manager Holdings](#form-13f-institutional-holdings-database)
 - [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
 - [Form N-PORT API - Mutual Fund Holdings](#form-n-port-api)
 
@@ -34,17 +31,29 @@
 
 - [Form ADV API - Investment Advisors (Firm & Indvl. Advisors, Brochures, Schedules)](#form-adv-api)
 
-**Other APIs:**
+**Structured Material Event Data from Form 8-K**
 
-- [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
-- [Float (Outstanding Shares) API](#float-outstanding-shares-api)
+- [Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)](#financial-restatements--non-reliance-on-prior-financial-results-item-402)
+
+**Public Company Data**
+
+- [Directors & Board Members API](#directors--board-members-data-api)
+- [Executive Compensation Data API](#executive-compensation-data-api)
+- [Outstanding Shares & Public Float](#outstanding-shares--public-float-api)
 - [Company Subsidiary API](#subsidiary-api)
+
+**Enforcement Actions & SRO Filings:**
+
 - [AAER Database API - Accounting and Auditing Enforcement Releases](#aaer-database-api)
 - [SRO Filings Database API](#sro-filings-database-api)
 
+**Other APIs:**
+
+- [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
+
 ## Data Coverage
 
-- Access to over 18 million SEC EDGAR filings from 1993 to the present, encompassing 650,000+ gigabytes of data.
+- Access to over 18 million SEC EDGAR filings from 1993 to the present
 - Supports all 150+ filing types, including 10-Q, 10-K, Form 4, 8-K, 13-F, S-1, 424B4, and many others. [See the full list of supported form types here.](https://sec-api.io/list-of-sec-filing-types)
 - Real-time access to newly published filings.
 - Includes XBRL-to-JSON converter and parser APIs for extracting standardized financial statements from any 10-K or 10-Q filing.
@@ -71,11 +80,15 @@ Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_
 
 ## SEC EDGAR Filings Query API
 
-The Query API allows you to search and filter all 18 million filings and exhibits published on SEC EDGAR using a large set of search parameters. You can search by ticker, CIK, form type, filing date, SIC code, period of report, series and class IDs, items of 8-K and other filings, and many more. The API returns all filing metadata in a [standardized JSON format](https://sec-api.io/docs/query-api#response-format). Filings are indexed and searchable as soon as they are published on SEC EDGAR. Various examples are provided below, in the [official documentation](https://sec-api.io/docs/query-api), and in our [sandbox](https://sec-api.io/sandbox).
+The Query API allows you to search and filter all 18 million filings and exhibits published on SEC EDGAR using a large set of search parameters. The database behind the Query API includes all EDGAR filing form types published since 1993 and over 800,000 EDGAR filer entities, with new filings being indexed and searchable as soon as they are published on SEC EDGAR.
 
----
+You can search filings by ticker, CIK, form type, filing date, SIC code, period of report, series and class IDs, items of 8-K and other filings, and many more. The API returns all filing metadata in a [standardized JSON format](https://sec-api.io/docs/query-api#response-format).
 
-The example below retrieves all 10-Q filings filed by TSLA in 2020.
+Examples are provided below, in the [official documentation](https://sec-api.io/docs/query-api), and in our [sandbox](https://sec-api.io/sandbox).
+
+### Examples
+
+The following example retrieves all 10-Q filings filed by TSLA in 2020.
 
 ```python
 from sec_api import QueryApi
@@ -94,7 +107,7 @@ filings = queryApi.get_filings(query)
 print(filings)
 ```
 
-Fetch most recent 8-Ks with Item 9.01 "Financial Statements and Exhibits".
+Find the most recently reported Form 8-K filings that include Item 9.01 "Financial Statements and Exhibits".
 
 ```python
 query = {
@@ -107,26 +120,52 @@ query = {
 filings = queryApi.get_filings(query)
 ```
 
-### 13F Institutional Investor Database
+> See the documentation for more details: https://sec-api.io/docs/query-api
 
-Fetch most recent 13F filings that hold Tesla.
+## Full-Text Search API
+
+Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
+
+---
+
+The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, that include the exact phrase "LPCN 1154".
 
 ```python
-from sec_api import QueryApi
+from sec_api import FullTextSearchApi
 
-queryApi = QueryApi(api_key="YOUR_API_KEY")
+fullTextSearchApi = FullTextSearchApi(api_key="YOUR_API_KEY")
 
 query = {
-  "query": "formType:\"13F\" AND holdings.ticker:TSLA",
-  "from": "0",
-  "size": "10",
-  "sort": [{ "filedAt": { "order": "desc" } }]
+  "query": '"LPCN 1154"',
+  "formTypes": ['8-K', '10-Q'],
+  "startDate": '2021-01-01',
+  "endDate": '2021-06-14',
 }
 
-filings = queryApi.get_filings(query)
+filings = fullTextSearchApi.get_filings(query)
+
+print(filings)
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/query-api
+> See the documentation for more details: https://sec-api.io/docs/full-text-search-api
+
+## Filing Render & Download API
+
+Used to download any filing or exhibit. You can process the downloaded filing in memory or save the filing to your hard drive.
+
+```python
+from sec_api import RenderApi
+
+renderApi = RenderApi(api_key="YOUR_API_KEY")
+
+url = "https://www.sec.gov/Archives/edgar/data/1662684/000110465921082303/tm2119986d1_8k.htm"
+
+filing = renderApi.get_filing(url)
+
+print(filing)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
 
 ## SEC EDGAR Filings Real-Time Stream API
 
@@ -170,33 +209,6 @@ asyncio.run(websocket_client())
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/stream-api
-
-## Full-Text Search API
-
-Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
-
----
-
-The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, that include the exact phrase "LPCN 1154".
-
-```python
-from sec_api import FullTextSearchApi
-
-fullTextSearchApi = FullTextSearchApi(api_key="YOUR_API_KEY")
-
-query = {
-  "query": '"LPCN 1154"',
-  "formTypes": ['8-K', '10-Q'],
-  "startDate": '2021-01-01',
-  "endDate": '2021-06-14',
-}
-
-filings = fullTextSearchApi.get_filings(query)
-
-print(filings)
-```
-
-> See the documentation for more details: https://sec-api.io/docs/full-text-search-api
 
 ## XBRL-To-JSON Converter API
 
@@ -509,176 +521,49 @@ extracted_section_8k = extractorApi.get_section(filing_url_8k, "1-1", "text")
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
 
-## Filing Render & Download API
+## Form ADV API
 
-Used to download any filing or exhibit. You can process the downloaded filing in memory or save the filing to your hard drive.
-
-```python
-from sec_api import RenderApi
-
-renderApi = RenderApi(api_key="YOUR_API_KEY")
-
-url = "https://www.sec.gov/Archives/edgar/data/1662684/000110465921082303/tm2119986d1_8k.htm"
-
-filing = renderApi.get_filing(url)
-
-print(filing)
-```
-
-> See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
-
-## CUSIP/CIK/Ticker Mapping API
-
-Resolve a CUSIP, CIK, ticker symbol or company name to a set of standardized company details. Listing companies by exchange, sector and industry is also supported.
-
-Map any of the following parameters to company details:
-
-- CUSIP
-- CIK
-- Ticker
-- Company name
-- Exchange
-- Sector
-- Industry
-
-The function returns an array of all matching companies in JSON format. For example, a look up of the ticker `IBM` returns multiple matches including `IBMD` and `IBME`.
-
-A company object includes the following properties:
-
-- `name` (string) - the name of the company, e.g. Tesla Inc
-- `ticker` (string) - the ticker symbol of the company.
-- `cik` (string) - the CIK of the company. Trailing zeros are removed.
-- `cusip` (string) - one or multiple CUSIPs linked to the company. Multiple CUSIPs are delimited by space, e.g. "054748108 92931L302 92931L401"
-- `exchange` (string) - the main exchange the company is listed on, e.g. NASDAQ
-- `isDelisted` (boolean) - true if the company is no longer listed, false otherwise.
-- `category` (string) - the security category, e.g. "Domestic Common Stock"
-- `sector` (string) - the sector of the company, e.g. "Consumer Cyclical"
-- `industry` (string) - the industry of the company, e.g. "Auto Manufacturers"
-- `sic` (string) - four-digit SIC code, e.g. "3711"
-- `sicSector` (string) - SIC sector name of the company, e.g. "Manufacturing"
-- `sicIndustry` (string) - SIC industry name of the company, e.g. "Motor Vehicles & Passenger Car Bodies"
-- `currency` (string) - operating currency of the company, e.g. "USD"
-- `location` (string) - location of the company's headquarters
-- `id` (string) - unique internal ID of the company, e.g. "e27d6e9606f216c569e46abf407685f3"
-
-Response type: `JSON`
-
-### Usage
+Search the entire Form ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings filed by advisory firms and 380,000 individual advisers and is updated daily. Search and find ADV filings by any filing property, such as CRD, assets under management, type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
 
 ```python
-from sec_api import MappingApi
+from sec_api import FormAdvApi
 
-mappingApi = MappingApi(api_key="YOUR_API_KEY")
+formAdvApi = FormAdvApi("YOUR_API_KEY")
 
-result1 = mappingApi.resolve("ticker", "TSLA")
-result2 = mappingApi.resolve("cik", "1318605")
-result3 = mappingApi.resolve("cusip", "88160R101")
-result4 = mappingApi.resolve("exchange", "NASDAQ")
+response = formAdvApi.get_firms(
+    {
+        "query": "Info.FirmCrdNb:361",
+        "from": "0",
+        "size": "10",
+        "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
+    }
+)
+print(response["filings"])
+
+direct_owners = formAdvApi.get_direct_owners(crd="793")
+print(direct_owners)
+
+indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
+print(indirect_owners)
+
+private_funds = formAdvApi.get_private_funds(crd="793")
+print(private_funds)
+
+response = formAdvApi.get_individuals(
+    {
+        "query": "CrntEmps.CrntEmp.orgPK:149777",
+        "from": "0",
+        "size": "10",
+        "sort": [{"id": {"order": "desc"}}],
+    }
+)
+print(response["filings"])
+
+response = formAdvApi.get_brochures(149777)
+print(response["brochures"])
 ```
 
-#### Response Example
-
-```json
-[
-  {
-    "name": "Tesla Inc",
-    "ticker": "TSLA",
-    "cik": "1318605",
-    "cusip": "88160R101",
-    "exchange": "NASDAQ",
-    "isDelisted": false,
-    "category": "Domestic Common Stock",
-    "sector": "Consumer Cyclical",
-    "industry": "Auto Manufacturers",
-    "sic": "3711",
-    "sicSector": "Manufacturing",
-    "sicIndustry": "Motor Vehicles & Passenger Car Bodies",
-    "famaSector": "",
-    "famaIndustry": "Automobiles and Trucks",
-    "currency": "USD",
-    "location": "California; U.S.A",
-    "id": "e27d6e9606f216c569e46abf407685f3"
-  }
-]
-```
-
-> See the documentation for more details: https://sec-api.io/docs/mapping-api
-
-## Directors & Board Members Data API
-
-Access and search the entire database of all directors and board members of all publicly listed companies on US stock exchanges. The database includes information about the CIK, ticker and company name the director is associated with, the name of the director, her/his age, position, director class, date of first election, independence status, committee memberships as well as qualifications and experiences.
-
-```python
-from sec_api import DirectorsBoardMembersApi
-
-directorsBoardMembersApi = DirectorsBoardMembersApi("YOUR_API_KEY")
-
-query = {
-    "query": "ticker:AMZN",
-    "from": 0,
-    "size": 50,
-    "sort": [{"filedAt": {"order": "desc"}}],
-}
-
-response = directorsBoardMembersApi.get_data(query)
-print(response["data"])
-```
-
-> See the documentation for more details: https://sec-api.io/docs/directors-and-board-members-data-api
-
-## Executive Compensation Data API
-
-The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time.
-
-You can search compensation data by 13 parameters, such as company ticker, executive name & position, annual salary, option awards and more.
-
-```python
-from sec_api import ExecCompApi
-
-execCompApi = ExecCompApi("YOUR_API_KEY")
-
-# Get data by ticker
-result_ticker = execCompApi.get_data("TSLA")
-
-# Get data by CIK
-result_cik = execCompApi.get_data("789019")
-
-# List all exec compensations of CIK 70858 for year 2020 and 2019
-# Sort result by year first, by name second
-query = {
-    "query": "cik:70858 AND (year:2020 OR year:2019)",
-    "from": "0",
-    "size": "200",
-    "sort": [{"year": {"order": "desc"}}, {"name.keyword": {"order": "asc"}}],
-}
-result_query = execCompApi.get_data(query)
-```
-
-### Response Example
-
-```json
-[
-  {
-    "id": "8e9177e3bcdb30ada8d092c195bd9d63",
-    "cik": "1318605",
-    "ticker": "TSLA",
-    "name": "Andrew Baglino",
-    "position": "SVP, Powertrain and Energy Engineering",
-    "year": 2020,
-    "salary": 283269,
-    "bonus": 0,
-    "stockAwards": 0,
-    "optionAwards": 46261354,
-    "nonEquityIncentiveCompensation": 0,
-    "changeInPensionValueAndDeferredEarnings": 0,
-    "otherCompensation": 0,
-    "total": 46544623
-  }
-  // and many more
-]
-```
-
-> See the documentation for more details: https://sec-api.io/docs/executive-compensation-api
+> See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
 
 ## Insider Trading Data API
 
@@ -754,117 +639,26 @@ print(insider_trades["transactions"])
 ]
 ```
 
-## Form N-PORT API
+## Form 13F Institutional Holdings Database
 
-Access and find standardized N-PORT SEC filings.
-
-```python
-from sec_api import FormNportApi
-
-nportApi = FormNportApi("YOUR_API_KEY")
-
-response = nportApi.get_data(
-    {
-        "query": "fundInfo.totAssets:[100000000 TO *]",
-        "from": "0",
-        "size": "10",
-        "sort": [{"filedAt": {"order": "desc"}}],
-    }
-)
-
-print(response["filings"])
-```
-
-> See the documentation for more details: https://sec-api.io/docs/n-port-data-api
-
-## Form S-1/424B4 API
-
-Access and find structured and standardized data extracted from S-1, F-1, and S-11 registration statements as well as 424B4 prospectus filings. The JSON data includes public offering prices, underwriting discounts, proceeds before expenses, security types being offered, underwriters (lead and co-managers), law firms, auditors, employee counts and management information (name, age, position).
+Find the most recently disclosed Form 13F filings that include Tesla as a holding.
 
 ```python
-from sec_api import Form_S1_424B4_Api
+from sec_api import QueryApi
 
-form_s1_424B4_api = Form_S1_424B4_Api("YOUR_API_KEY")
+queryApi = QueryApi(api_key="YOUR_API_KEY")
 
 query = {
-    "query": "ticker:V",
-    "from": "0",
-    "size": "50",
-    "sort": [{"filedAt": {"order": "desc"}}],
+  "query": "formType:\"13F\" AND holdings.ticker:TSLA",
+  "from": "0",
+  "size": "10",
+  "sort": [{ "filedAt": { "order": "desc" } }]
 }
 
-response = form_s1_424B4_api.get_data(query)
-print(response["data"])
+filings = queryApi.get_filings(query)
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/form-s1-424b4-data-search-api
-
-## Form D API
-
-Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by hedge funds, type of securities offered and many more.
-
-```python
-from sec_api import FormDApi
-
-formDApi = FormDApi("YOUR_API_KEY")
-
-response = formDApi.get_data(
-    {
-        "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]",
-        "from": "0",
-        "size": "10",
-        "sort": [{"filedAt": {"order": "desc"}}],
-    }
-)
-
-print(response["offerings"])
-```
-
-> See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
-
-## Form ADV API
-
-Search the entire Form ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings filed by advisory firms and 380,000 individual advisers and is updated daily. Search and find ADV filings by any filing property, such as CRD, assets under management, type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
-
-```python
-from sec_api import FormAdvApi
-
-formAdvApi = FormAdvApi("YOUR_API_KEY")
-
-response = formAdvApi.get_firms(
-    {
-        "query": "Info.FirmCrdNb:361",
-        "from": "0",
-        "size": "10",
-        "sort": [{"Info.FirmCrdNb": {"order": "desc"}}],
-    }
-)
-print(response["filings"])
-
-direct_owners = formAdvApi.get_direct_owners(crd="793")
-print(direct_owners)
-
-indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
-print(indirect_owners)
-
-private_funds = formAdvApi.get_private_funds(crd="793")
-print(private_funds)
-
-response = formAdvApi.get_individuals(
-    {
-        "query": "CrntEmps.CrntEmp.orgPK:149777",
-        "from": "0",
-        "size": "10",
-        "sort": [{"id": {"order": "desc"}}],
-    }
-)
-print(response["filings"])
-
-response = formAdvApi.get_brochures(149777)
-print(response["brochures"])
-```
-
-> See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
+> See the documentation for more details: https://sec-api.io/docs/query-api/13f-institutional-ownership-api
 
 ## Form 13D/13G API
 
@@ -944,9 +738,175 @@ print(response["filings"])
 }
 ```
 
-## Float (Outstanding Shares) API
+## Form N-PORT API
 
-The Float API returns the number of outstanding shares of any publicly traded company listed on US exchanges. The dataset includes the most recent float as well as historical float data. If a company registered multiple share classes, the API returns the number of shares outstanding of each class.
+Access and find standardized N-PORT SEC filings.
+
+```python
+from sec_api import FormNportApi
+
+nportApi = FormNportApi("YOUR_API_KEY")
+
+response = nportApi.get_data(
+    {
+        "query": "fundInfo.totAssets:[100000000 TO *]",
+        "from": "0",
+        "size": "10",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["filings"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/n-port-data-api
+
+## Form S-1/424B4 API
+
+Access and find structured and standardized data extracted from S-1, F-1, and S-11 registration statements as well as 424B4 prospectus filings. The JSON data includes public offering prices, underwriting discounts, proceeds before expenses, security types being offered, underwriters (lead and co-managers), law firms, auditors, employee counts and management information (name, age, position).
+
+```python
+from sec_api import Form_S1_424B4_Api
+
+form_s1_424B4_api = Form_S1_424B4_Api("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:V",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form_s1_424B4_api.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-s1-424b4-data-search-api
+
+## Form D API
+
+Search and find Form D offering filings by any filing property, e.g. total offering amount, offerings filed by hedge funds, type of securities offered and many more.
+
+```python
+from sec_api import FormDApi
+
+formDApi = FormDApi("YOUR_API_KEY")
+
+response = formDApi.get_data(
+    {
+        "query": "offeringData.offeringSalesAmounts.totalOfferingAmount:[1000000 TO *]",
+        "from": "0",
+        "size": "10",
+        "sort": [{"filedAt": {"order": "desc"}}],
+    }
+)
+
+print(response["offerings"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
+
+## Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)
+
+Access and search all financial restatements and non-reliance on prior financial results filings from 2004 to present. The database includes information about the CIK, ticker and company name the restatement is associated with, the publication date of the restatement, list of identified issues, affected reporting periods that require restatement, affected financial statement items, auditor involvement, and more.
+
+```python
+from sec_api import Item_4_02_Api
+
+item_4_02_api = Item_4_02_Api("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:*AEON*",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = item_4_02_api.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-8k-data-search-api
+
+## Directors & Board Members Data API
+
+Access and search the entire database of all directors and board members of all publicly listed companies on US stock exchanges. The database includes information about the CIK, ticker and company name the director is associated with, the name of the director, her/his age, position, director class, date of first election, independence status, committee memberships as well as qualifications and experiences.
+
+```python
+from sec_api import DirectorsBoardMembersApi
+
+directorsBoardMembersApi = DirectorsBoardMembersApi("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:AMZN",
+    "from": 0,
+    "size": 50,
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = directorsBoardMembersApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/directors-and-board-members-data-api
+
+## Executive Compensation Data API
+
+The API provides standardized compensation data of all key executives as reported in SEC filing DEF 14A. The dataset is updated in real-time.
+
+You can search compensation data by 13 parameters, such as company ticker, executive name & position, annual salary, option awards and more.
+
+```python
+from sec_api import ExecCompApi
+
+execCompApi = ExecCompApi("YOUR_API_KEY")
+
+# Get data by ticker
+result_ticker = execCompApi.get_data("TSLA")
+
+# Get data by CIK
+result_cik = execCompApi.get_data("789019")
+
+# List all exec compensations of CIK 70858 for year 2020 and 2019
+# Sort result by year first, by name second
+query = {
+    "query": "cik:70858 AND (year:2020 OR year:2019)",
+    "from": "0",
+    "size": "200",
+    "sort": [{"year": {"order": "desc"}}, {"name.keyword": {"order": "asc"}}],
+}
+result_query = execCompApi.get_data(query)
+```
+
+### Response Example
+
+```json
+[
+  {
+    "id": "8e9177e3bcdb30ada8d092c195bd9d63",
+    "cik": "1318605",
+    "ticker": "TSLA",
+    "name": "Andrew Baglino",
+    "position": "SVP, Powertrain and Energy Engineering",
+    "year": 2020,
+    "salary": 283269,
+    "bonus": 0,
+    "stockAwards": 0,
+    "optionAwards": 46261354,
+    "nonEquityIncentiveCompensation": 0,
+    "changeInPensionValueAndDeferredEarnings": 0,
+    "otherCompensation": 0,
+    "total": 46544623
+  }
+  // and many more
+]
+```
+
+> See the documentation for more details: https://sec-api.io/docs/executive-compensation-api
+
+## Outstanding Shares & Public Float API
+
+The Float API returns the number of outstanding shares and public float of any publicly traded company listed on US exchanges. The dataset includes the most recently reported number of outstanding shares and float as well as historical data. If a company registered multiple share classes, the API returns the number of shares outstanding of each class.
 
 ```python
 from sec_api import FloatApi
@@ -1107,6 +1067,83 @@ print(response["data"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sro-filings-database-api
+
+## CUSIP/CIK/Ticker Mapping API
+
+Resolve a CUSIP, CIK, ticker symbol or company name to a set of standardized company details. Listing companies by exchange, sector and industry is also supported.
+
+Map any of the following parameters to company details:
+
+- CUSIP
+- CIK
+- Ticker
+- Company name
+- Exchange
+- Sector
+- Industry
+
+The function returns an array of all matching companies in JSON format. For example, a look up of the ticker `IBM` returns multiple matches including `IBMD` and `IBME`.
+
+A company object includes the following properties:
+
+- `name` (string) - the name of the company, e.g. Tesla Inc
+- `ticker` (string) - the ticker symbol of the company.
+- `cik` (string) - the CIK of the company. Trailing zeros are removed.
+- `cusip` (string) - one or multiple CUSIPs linked to the company. Multiple CUSIPs are delimited by space, e.g. "054748108 92931L302 92931L401"
+- `exchange` (string) - the main exchange the company is listed on, e.g. NASDAQ
+- `isDelisted` (boolean) - true if the company is no longer listed, false otherwise.
+- `category` (string) - the security category, e.g. "Domestic Common Stock"
+- `sector` (string) - the sector of the company, e.g. "Consumer Cyclical"
+- `industry` (string) - the industry of the company, e.g. "Auto Manufacturers"
+- `sic` (string) - four-digit SIC code, e.g. "3711"
+- `sicSector` (string) - SIC sector name of the company, e.g. "Manufacturing"
+- `sicIndustry` (string) - SIC industry name of the company, e.g. "Motor Vehicles & Passenger Car Bodies"
+- `currency` (string) - operating currency of the company, e.g. "USD"
+- `location` (string) - location of the company's headquarters
+- `id` (string) - unique internal ID of the company, e.g. "e27d6e9606f216c569e46abf407685f3"
+
+Response type: `JSON`
+
+### Usage
+
+```python
+from sec_api import MappingApi
+
+mappingApi = MappingApi(api_key="YOUR_API_KEY")
+
+result1 = mappingApi.resolve("ticker", "TSLA")
+result2 = mappingApi.resolve("cik", "1318605")
+result3 = mappingApi.resolve("cusip", "88160R101")
+result4 = mappingApi.resolve("exchange", "NASDAQ")
+```
+
+#### Response Example
+
+```json
+[
+  {
+    "name": "Tesla Inc",
+    "ticker": "TSLA",
+    "cik": "1318605",
+    "cusip": "88160R101",
+    "exchange": "NASDAQ",
+    "isDelisted": false,
+    "category": "Domestic Common Stock",
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers",
+    "sic": "3711",
+    "sicSector": "Manufacturing",
+    "sicIndustry": "Motor Vehicles & Passenger Car Bodies",
+    "famaSector": "",
+    "famaIndustry": "Automobiles and Trucks",
+    "currency": "USD",
+    "location": "California; U.S.A",
+    "id": "e27d6e9606f216c569e46abf407685f3"
+  }
+]
+```
+
+> See the documentation for more details: https://sec-api.io/docs/mapping-api
 
 ## Proxy Support
 

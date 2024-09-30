@@ -15,6 +15,7 @@ from sec_api.index import (
     SubsidiaryApi,
     AaerApi,
     SroFilingsApi,
+    Item_4_02_Api,
 )
 
 #
@@ -329,5 +330,21 @@ query = {
 }
 
 response = sroFilingsApi.get_data(query)
+print(response["data"])
+# """
+
+#
+# Form 8-K Item 4.02 API Example
+#
+"""
+item_4_02_api = Item_4_02_Api("YOUR_API_KEY")
+
+query = {
+    "query": "ticker:AEON",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+response = item_4_02_api.get_data(query)
 print(response["data"])
 # """

@@ -24,6 +24,9 @@ from sec_api.index import FormDApi
 # Investment Adviser API
 from sec_api.index import FormAdvApi
 
+# Structured data from Form 8-Ks
+from sec_api.index import Item_4_02_Api
+
 # Other APIs
 from sec_api.index import MappingApi
 from sec_api.index import FloatApi
