@@ -9,6 +9,7 @@ It includes:
 - [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
 - [Real-Time Filing Stream API](#sec-edgar-filings-real-time-stream-api)
 - [Filing Download & PDF Render API](#filing-render--download-api)
+- [PDF Generator API](#pdf-generator-api)
 
 **Converter & Extractor APIs:**
 
@@ -171,6 +172,28 @@ binary_data = renderApi.get_file(pdf_file_url, return_binary=True)
 
 with open("filename.pdf", "wb") as f:
     f.write(binary_data)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
+
+## PDF Generator API
+
+SEC filings, including Forms 10-K, 10-Q, 8-K, and others, are typically published in HTML, XML, or text formats. The PDF Generator API enables the conversion of any SEC filing or exhibit into a PDF file, preserving all original formatting, tables, images, and other elements from the filing.
+
+```python
+from sec_api import PdfGeneratorApi
+
+pdfGeneratorApi = PdfGeneratorApi("YOUR_API_KEY")
+
+# Form 8-K exhibit URL
+edgar_file_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
+# Form 10-K filing URL
+# edgar_file_url = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+
+pdf_file = pdfGeneratorApi.get_pdf(edgar_file_url)
+
+with open("filename.pdf", "wb") as f:
+    f.write(pdf_file)
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api

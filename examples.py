@@ -1,5 +1,6 @@
 from sec_api.index import (
     RenderApi,
+    PdfGeneratorApi,
     XbrlApi,
     ExtractorApi,
     MappingApi,
@@ -42,6 +43,24 @@ binary_data = renderApi.get_file(pdf_file_url, return_binary=True)
 with open("filename.pdf", "wb") as f:
     f.write(binary_data)
 # """
+
+#
+# PDF Generator API
+#
+"""
+pdfGeneratorApi = PdfGeneratorApi("YOUR_API_KEY")
+
+# Form 8-K exhibit URL
+edgar_file_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
+# Form 10-K filing URL
+# edgar_file_url = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+
+pdf_file = pdfGeneratorApi.get_pdf(edgar_file_url)
+
+with open("filename.pdf", "wb") as f:
+    f.write(pdf_file)
+# """
+
 
 #
 # XBRL-to-JSON API example

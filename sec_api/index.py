@@ -5,7 +5,8 @@ import time
 
 query_api_endpoint = "https://api.sec-api.io"
 full_text_search_api_endpoint = "https://api.sec-api.io/full-text-search"
-render_api_endpoint = "https://archive.sec-api.io"
+filing_download_api_endpoint = "https://archive.sec-api.io"
+pdf_generator_api_endpoint = "https://api.sec-api.io/filing-reader"
 xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
 extractor_api_endpoint = "https://api.sec-api.io/extractor"
 #
@@ -102,7 +103,7 @@ class RenderApi:
 
     def __init__(self, api_key, proxies=None):
         self.api_key = api_key
-        self.api_endpoint = render_api_endpoint
+        self.api_endpoint = filing_download_api_endpoint
         self.proxies = proxies if proxies else {}
 
     def get_filing(self, url, return_binary=False):
@@ -137,6 +138,37 @@ class RenderApi:
             response = requests.get(_url, proxies=self.proxies)
             if response.status_code == 200:
                 return response.text if not return_binary else response.content
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class PdfGeneratorApi:
+    """
+    Base class for PDF Generator API
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = pdf_generator_api_endpoint
+        self.proxies = proxies if proxies else {}
+
+    def get_pdf(self, url):
+        response = {}
+        file_url = re.sub(r"ix\?doc=/", "", url)
+        _url = (
+            self.api_endpoint + "?type=pdf&url=" + file_url + "&token=" + self.api_key
+        )
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(_url, proxies=self.proxies)
+            if response.status_code == 200:
+                return response.content
             elif response.status_code == 429:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
