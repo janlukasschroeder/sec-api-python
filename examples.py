@@ -30,7 +30,17 @@ filing_data = renderApi.get_filing(
     url="https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
 )
 
-print(filing_data)
+print(filing_data[:300])
+
+# for non-text data, such as a PDF files or an images,
+# use get_file() and set `return_binary=True` to get the binary data
+pdf_file_url = (
+    "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
+)
+binary_data = renderApi.get_file(pdf_file_url, return_binary=True)
+
+with open("filename.pdf", "wb") as f:
+    f.write(binary_data)
 # """
 
 #

@@ -105,7 +105,7 @@ class RenderApi:
         self.api_endpoint = render_api_endpoint
         self.proxies = proxies if proxies else {}
 
-    def get_filing(self, url, as_pdf=False):
+    def get_filing(self, url, return_binary=False):
         response = {}
         # remove "ix?doc=/" from URL
         filename = re.sub(r"ix\?doc=/", "", url)
@@ -116,7 +116,27 @@ class RenderApi:
         for x in range(3):
             response = requests.get(_url, proxies=self.proxies)
             if response.status_code == 200:
-                return response.text
+                return response.text if not return_binary else response.content
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+    def get_file(self, url, return_binary=False):
+        response = {}
+        # remove "ix?doc=/" from URL
+        filename = re.sub(r"ix\?doc=/", "", url)
+        filename = re.sub(r"https://www.sec.gov/Archives/edgar/data", "", filename)
+        _url = self.api_endpoint + filename + "?token=" + self.api_key
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(_url, proxies=self.proxies)
+            if response.status_code == 200:
+                return response.text if not return_binary else response.content
             elif response.status_code == 429:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
