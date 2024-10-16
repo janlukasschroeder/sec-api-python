@@ -169,7 +169,7 @@ class PdfGeneratorApi:
             response = requests.get(_url, proxies=self.proxies)
             if response.status_code == 200:
                 return response.content
-            elif response.status_code == 429:
+            elif response.status_code == 429 or response.status_code == 202:
                 # wait 500 * (x + 1) milliseconds and try again
                 time.sleep(0.5 * (x + 1))
             else:
