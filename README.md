@@ -34,7 +34,9 @@ It includes:
 
 **Structured Material Event Data from Form 8-K**
 
+- [Auditor and Accountant Changes (Item 4.01)](#auditor-and-accountant-changes-item-401)
 - [Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)](#financial-restatements--non-reliance-on-prior-financial-results-item-402)
+- [Changes of Directors, Board Members and Compensation Plans (Item 5.02)](#changes-of-directors-executives-board-members-and-compensation-plans-item-502)
 
 **Public Company Data**
 
@@ -45,12 +47,14 @@ It includes:
 
 **Enforcement Actions & SRO Filings:**
 
+- [SEC Litigation Releases](#sec-litigation-releases-database-api)
 - [AAER Database API - Accounting and Auditing Enforcement Releases](#aaer-database-api)
 - [SRO Filings Database API](#sro-filings-database-api)
 
 **Other APIs:**
 
 - [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
+- [EDGAR Entities Database API](#edgar-entities-database)
 
 ## Data Coverage
 
@@ -837,27 +841,70 @@ print(response["offerings"])
 
 > See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
 
-## Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)
+## Structured Data of Material Event Disclosures under Form 8-K
 
-Access and search all financial restatements and non-reliance on prior financial results filings from 2004 to present. The database includes information about the CIK, ticker and company name the restatement is associated with, the publication date of the restatement, list of identified issues, affected reporting periods that require restatement, affected financial statement items, auditor involvement, and more.
+### Auditor and Accountant Changes (Item 4.01)
+
+Access and search over 25,000 change-of-accountant disclosures under Item 4.01 in SEC Form 8-K filings, spanning from 2004 to present. Access information about former and newly appointed auditors, the reason for the change, the date of the change, the type of engagement, statements regarding material weaknesses in internal controls, and more.
 
 ```python
-from sec_api import Item_4_02_Api
+from sec_api import Form_8K_Item_X_Api
 
-item_4_02_api = Item_4_02_Api("YOUR_API_KEY")
+item_X_api = Form_8K_Item_X_Api("YOUR_API_KEY")
 
-query = {
-    "query": "ticker:*",
+item_4_01_request = {
+    "query": "item4_01:* AND filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",  # increase by 50 to fetch the next 50 results
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+item_4_01_response = item_X_api.get_data(item_4_01_request)
+print(item_4_01_response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-8k-data-item4-1-search-api
+
+### Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)
+
+Access and search over 8,000 financial restatements and non-reliance on prior financial results filings from 2004 to present. The database includes information about the CIK, ticker and company name the restatement is associated with, the publication date of the restatement, list of identified issues, affected reporting periods that require restatement, affected financial statement items, auditor involvement, and more.
+
+```python
+from sec_api import Form_8K_Item_X_Api
+
+item_X_api = Form_8K_Item_X_Api("YOUR_API_KEY")
+
+item_4_02_request = {
+    "query": "item4_02:* AND filedAt:[2024-01-01 TO 2024-12-31]",
     "from": "0",
     "size": "50",
     "sort": [{"filedAt": {"order": "desc"}}],
 }
-
-response = item_4_02_api.get_data(query)
-print(response["data"])
+item_4_02_response = item_X_api.get_data(item_4_02_request)
+print(item_4_02_response["data"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/form-8k-data-search-api
+
+### Changes of Directors, Executives, Board Members and Compensation Plans (Item 5.02)
+
+Access and search over 250,000 changes of directors, executives, board members and compensation plans disclosures under Item 5.02 in SEC Form 8-K filings, spanning from 2004 to present. The database includes information about the CIK, ticker and company name the change is associated with, the publication date of the change, the name of the director, her/his age, position, academic affiliations, compensation details, committee memberships, and more.
+
+```python
+from sec_api import Form_8K_Item_X_Api
+
+item_X_api = Form_8K_Item_X_Api("YOUR_API_KEY")
+
+item_5_02_request = {
+    "query": "item5_02:* AND filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+item_5_02_response = item_X_api.get_data(item_5_02_request)
+print(item_5_02_response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-8k-data-item5-2-search-api
 
 ## Directors & Board Members Data API
 
@@ -1077,6 +1124,28 @@ print(response["data"])
 
 > See the documentation for more details: https://sec-api.io/docs/aaer-database-api
 
+## SEC Litigation Releases Database API
+
+Access and search the SEC Litigation Releases database. The database includes metadata and extracted structured data from all SEC Litigation Releases filed from 1995 to present.
+
+```python
+from sec_api import SecLitigationApi
+
+secLitigationApi = SecLitigationApi("YOUR_API_KEY")
+
+query = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"releasedAt": {"order": "desc"}}],
+}
+
+response = secLitigationApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-litigation-releases-database-api
+
 ## SRO Filings Database API
 
 Access and search all SRO filings published from 1995 to present. The database includes more than 30,000 SRO filings from all types of organizations, including National Securities Exchanges (NYSE, NASDAQ, CBOE, etc.), Joint Industry Plans, FINRA, Futures Exchanges (CME, CBOT, etc.), and more.
@@ -1175,6 +1244,25 @@ result4 = mappingApi.resolve("exchange", "NASDAQ")
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/mapping-api
+
+## EDGAR Entities Database
+
+Access information on over 800,000 EDGAR filing entities that have filed with the SEC since 1994. The database includes information about the CIK, IRS number, state of incorporation, fiscal year end, SIC code, current auditor, latest ICFR audit date, filer category, and more.
+
+```python
+edgarEntitiesApi = EdgarEntitiesApi("YOUR_API_KEY")
+
+search_request = {
+    "query": "cik:1318605",
+    "from": "0",
+    "size": "50",
+    "sort": [{"cikUpdatedAt": {"order": "desc"}}],
+}
+response = edgarEntitiesApi.get_data(search_request)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/edgar-entities-database-api
 
 ## Proxy Support
 

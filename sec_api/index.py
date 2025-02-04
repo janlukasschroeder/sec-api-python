@@ -20,6 +20,7 @@ form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
 #
 form_8K_item_4_02_api_endpoint = "https://api.sec-api.io/form-8k"
+form_8K_item_x_api_endpoint = "https://api.sec-api.io/form-8k"
 #
 exec_comp_api_endpoint = "https://api.sec-api.io/compensation"
 directors_board_members_api_endpoint = (
@@ -29,9 +30,11 @@ float_api_endpoint = "https://api.sec-api.io/float"
 subsidiary_endpoint = "https://api.sec-api.io/subsidiaries"
 #
 aaer_search_endpoint = "https://api.sec-api.io/aaers"
+sec_litigations_search_endpoint = "https://api.sec-api.io/sec-litigation-releases"
 sro_search_endpoint = "https://api.sec-api.io/sro"
 #
 mapping_api_endpoint = "https://api.sec-api.io/mapping"
+edgar_entities_endpoint = "https://api.sec-api.io/edgar-entities"
 
 
 def handle_api_error(response):
@@ -729,6 +732,36 @@ class AaerApi:
             handle_api_error(response)
 
 
+class SecLitigationsApi:
+    """
+    Base class for SEC Litigation Releases API
+    https://sec-api.io/docs/sec-litigation-releases-database-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_search_endpoint = sec_litigations_search_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_search_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
 class SroFilingsApi:
     """
     Base class for SRO Filings Database API
@@ -759,6 +792,35 @@ class SroFilingsApi:
             handle_api_error(response)
 
 
+class Form_8K_Item_X_Api:
+    """
+    Base class for Form 8-K Item X API
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_8K_item_x_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
 class Item_4_02_Api:
     """
     Base class for Form 8-K Item 4.02 API
@@ -767,6 +829,36 @@ class Item_4_02_Api:
     def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = form_8K_item_4_02_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class EdgarEntitiesApi:
+    """
+    Base class for EDGAR Entities Database API
+    https://sec-api.io/docs/edgar-entities-database-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = edgar_entities_endpoint + "?token=" + api_key
         self.proxies = proxies if proxies else {}
 
     def get_data(self, query):

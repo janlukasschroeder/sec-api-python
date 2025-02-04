@@ -3,7 +3,6 @@ from sec_api.index import (
     PdfGeneratorApi,
     XbrlApi,
     ExtractorApi,
-    MappingApi,
     DirectorsBoardMembersApi,
     ExecCompApi,
     InsiderTradingApi,
@@ -15,8 +14,12 @@ from sec_api.index import (
     Form_S1_424B4_Api,
     SubsidiaryApi,
     AaerApi,
+    SecLitigationsApi,
     SroFilingsApi,
     Item_4_02_Api,
+    Form_8K_Item_X_Api,
+    MappingApi,
+    EdgarEntitiesApi,
 )
 
 #
@@ -347,6 +350,24 @@ print(response["data"])
 
 
 #
+# SEC Litigation Releases API Example
+#
+"""
+secLitigationsApi = SecLitigationsApi("YOUR_API_KEY")
+
+query = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"releasedAt": {"order": "desc"}}],
+}
+
+response = secLitigationsApi.get_data(query)
+print(response["data"])
+# """
+
+
+#
 # SRO Filings API Example
 #
 """
@@ -376,5 +397,46 @@ query = {
     "sort": [{"filedAt": {"order": "desc"}}],
 }
 response = item_4_02_api.get_data(query)
+print(response["data"])
+# """
+
+#
+# Form 8-K Item X API Examples
+#
+"""
+item_X_api = Form_8K_Item_X_Api("YOUR_API_KEY")
+
+item_4_01_request = {
+    "query": "item4_01:* AND filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",  # increase by 50 to fetch the next 50 results, e.g. 50 (=page 2), 100 (=page 3), 150 (=page 4), ...
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+item_4_01_response = item_X_api.get_data(item_4_01_request)
+print(item_4_01_response["data"])
+
+item_5_02_request = {
+    "query": "item5_02:* AND filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",  # increase by 50 to fetch the next 50 results, e.g. 50 (=page 2), 100 (=page 3), 150 (=page 4), ...
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+item_5_02_response = item_X_api.get_data(item_5_02_request)
+print(item_5_02_response["data"])
+# """
+
+#
+# EDGAR Entities Database API Example
+#
+"""
+edgarEntitiesApi = EdgarEntitiesApi("YOUR_API_KEY")
+
+search_request = {
+    "query": "cik:1318605",
+    "from": "0",
+    "size": "50",
+    "sort": [{"cikUpdatedAt": {"order": "desc"}}],
+}
+response = edgarEntitiesApi.get_data(search_request)
 print(response["data"])
 # """

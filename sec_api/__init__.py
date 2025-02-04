@@ -27,10 +27,13 @@ from sec_api.index import FormAdvApi
 
 # Structured data from Form 8-Ks
 from sec_api.index import Item_4_02_Api
+from sec_api.index import Form_8K_Item_X_Api
 
 # Other APIs
 from sec_api.index import MappingApi
+from sec_api.index import EdgarEntitiesApi
 from sec_api.index import FloatApi
 from sec_api.index import SubsidiaryApi
 from sec_api.index import AaerApi
+from sec_api.index import SecLitigationsApi
 from sec_api.index import SroFilingsApi
