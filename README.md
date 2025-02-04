@@ -1129,18 +1129,18 @@ print(response["data"])
 Access and search the SEC Litigation Releases database. The database includes metadata and extracted structured data from all SEC Litigation Releases filed from 1995 to present.
 
 ```python
-from sec_api import SecLitigationApi
+from sec_api import SecLitigationsApi
 
-secLitigationApi = SecLitigationApi("YOUR_API_KEY")
+secLitigationsApi = SecLitigationsApi("YOUR_API_KEY")
 
-query = {
+searchRequest = {
     "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
     "from": "0",
     "size": "50",
     "sort": [{"releasedAt": {"order": "desc"}}],
 }
 
-response = secLitigationApi.get_data(query)
+response = secLitigationsApi.get_data(searchRequest)
 print(response["data"])
 ```
 
