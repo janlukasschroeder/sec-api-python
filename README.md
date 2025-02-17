@@ -1,36 +1,38 @@
 # SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
 
-**sec-api** is a Python package allowing you to search the entire SEC EDGAR filings corpus and access petabytes of regulatory information published by public and private companies, insiders such as directors and board members, hedge and mutual funds, financial advisors, business development companies, and more.
+**sec-api** is a Python package allowing you to search the entire SEC EDGAR filings corpus and access petabytes of regulatory information published by public and private companies, insiders such as directors and board members, hedge and mutual funds, financial advisors, business development companies, and more. It includes:
 
-It includes:
-
-**EDGAR Filing Search & Download**
+**EDGAR Filing Search & Download APIs**
 
 - [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
 - [Real-Time Filing Stream API](#sec-edgar-filings-real-time-stream-api)
-- [Filing Download & PDF Render API](#filing-render--download-api)
-- [PDF Generator API](#pdf-generator-api)
+- [Download API - Download any SEC filing, exhibit and attached file](#filing--exhibit-download-api)
+- [PDF Generator API - Download SEC filings and exhibits as PDF](#pdf-generator-api)
 
-**Converter & Extractor APIs:**
+**Converter & Extractor APIs**
 
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
 
-**Ownership Data APIs:**
+**Investment Advisers**
 
-- [Form 3/4/5 API - Insider Trading](#insider-trading-data-api)
-- [Form 13F API - Institutional Investment Manager Holdings](#form-13f-institutional-holdings-database)
+- [Form ADV API - Investment Advisors (Firm & Indvl. Advisors, Brochures, Schedules)](#form-adv-api)
+
+**Ownership Data APIs**
+
+- [Form 3/4/5 API - Insider Trading Disclosures](#insider-trading-data-api)
+- [Form 13F API - Institutional Investment Manager Holdings & Cover Pages](#form-13f-institutional-holdings-database)
 - [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
-- [Form N-PORT API - Mutual Fund Holdings](#form-n-port-api)
+- [Form N-PORT API - Mutual Funds, ETFs and Closed-End Fund Holdings](#form-n-port-api)
 
-**Security Offerings APIs:**
+**Proxy Voting Records**
+
+- [Form N-PX Proxy Voting Records API](#form-n-px-proxy-voting-records-api)
+
+**Security Offerings APIs**
 
 - [Form S-1/424B4 API - Registration Statements and Prospectuses (IPOs, Debt/Warrants/... Offerings)](#form-s-1424b4-api)
 - [Form D API - Private Security Offerings](#form-d-api)
-
-**Investment Advisers:**
-
-- [Form ADV API - Investment Advisors (Firm & Indvl. Advisors, Brochures, Schedules)](#form-adv-api)
 
 **Structured Material Event Data from Form 8-K**
 
@@ -45,13 +47,15 @@ It includes:
 - [Outstanding Shares & Public Float](#outstanding-shares--public-float-api)
 - [Company Subsidiary API](#subsidiary-api)
 
-**Enforcement Actions & SRO Filings:**
+**Enforcement Actions, Proceedings, AAERs & SRO Filings**
 
+- [SEC Enforcement Actions](#sec-enforcement-actions-database-api)
 - [SEC Litigation Releases](#sec-litigation-releases-database-api)
+- [SEC Administrative Proceedings](#sec-administrative-proceedings-database-api)
 - [AAER Database API - Accounting and Auditing Enforcement Releases](#aaer-database-api)
 - [SRO Filings Database API](#sro-filings-database-api)
 
-**Other APIs:**
+**Other APIs**
 
 - [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
 - [EDGAR Entities Database API](#edgar-entities-database)
@@ -154,28 +158,42 @@ print(filings)
 
 > See the documentation for more details: https://sec-api.io/docs/full-text-search-api
 
-## Filing Render & Download API
+## Filing & Exhibit Download API
 
-Used to download any filing or exhibit. You can process the downloaded filing in memory or save the filing to your hard drive.
+Download any SEC EDGAR filing, exhibit and attached file in its original format (HTML, XML, JPEG, Excel, text, PDF, etc.). The API supports downloading all EDGAR form types, including 10-K, 10-Q, 8-K, 13-F, S-1, 424B4, and many others published since 1993 and provides access to over 18 million filings and over 100 million exhibits and filing attachments. Download up to 40 files per second.
 
 ```python
 from sec_api import RenderApi
 
 renderApi = RenderApi(api_key="YOUR_API_KEY")
 
-url = "https://www.sec.gov/Archives/edgar/data/1662684/000110465921082303/tm2119986d1_8k.htm"
+# example URLs: SEC filings, exhibits, images, Excel sheets, PDFs
+url_8k_html       = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/nvda-20230222.htm"
+url_8k_txt        = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/0001045810-23-000014.txt"
+url_exhibit99     = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/q4fy23pr.htm"
+url_xbrl_instance = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/nvda-20230222_htm.xml"
+url_excel_file    = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/Financial_Report.xlsx"
+url_pdf_file      = "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
+url_image_file    = "https://www.sec.gov/Archives/edgar/data/1424404/000106299324017776/form10kxz001.jpg"
 
-filing = renderApi.get_filing(url)
+filing_8k_html = renderApi.get_file(url_8k_html)
+filing_8k_txt  = renderApi.get_file(url_8k_txt)
+exhibit99      = renderApi.get_file(url_exhibit99)
+xbrl_instance  = renderApi.get_file(url_xbrl_instance)
 
-print(filing)
+# use .get_file() and set return_binary=True
+# to get non-text files such as images, PDFs, etc.
+excel_file     = renderApi.get_file(url_excel_file, return_binary=True)
+pdf_file       = renderApi.get_file(url_pdf_file, return_binary=True)
+image_file     = renderApi.get_file(url_image_file, return_binary=True)
 
-# for non-text data, such as a PDF files or an images,
-# use get_file() and set `return_binary=True` to get the binary data
-pdf_file_url = "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
-binary_data = renderApi.get_file(pdf_file_url, return_binary=True)
-
-with open("filename.pdf", "wb") as f:
-    f.write(binary_data)
+# save files to disk
+with open("filing_8k_html.htm", "wb") as f:
+    f.write(filing_8k_html.encode("utf-8"))
+with open("pdf_file.pdf", "wb") as f:
+    f.write(pdf_file)
+with open("image.jpg", "wb") as f:
+    f.write(image_file)
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
@@ -189,15 +207,19 @@ from sec_api import PdfGeneratorApi
 
 pdfGeneratorApi = PdfGeneratorApi("YOUR_API_KEY")
 
-# Form 8-K exhibit URL
-edgar_file_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
-# Form 10-K filing URL
-# edgar_file_url = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+# examples: 10-K filing, Form 8-K exhibit
+url_10k_filing = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+url_8k_exhibit_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
 
-pdf_file = pdfGeneratorApi.get_pdf(edgar_file_url)
+# get PDFs
+pdf_10k_filing = pdfGeneratorApi.get_pdf(url_10k_filing)
+pdf_8k_exhibit = pdfGeneratorApi.get_pdf(url_8k_exhibit_url)
 
-with open("filename.pdf", "wb") as f:
-    f.write(pdf_file)
+# save PDFs to disk
+with open("pdf_10k_filing.pdf", "wb") as f:
+    f.write(pdf_10k_filing)
+with open("pdf_8k_exhibit.pdf", "wb") as f:
+    f.write(pdf_8k_exhibit)
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-render-api
@@ -676,24 +698,51 @@ print(insider_trades["transactions"])
 
 ## Form 13F Institutional Holdings Database
 
-Find the most recently disclosed Form 13F filings that include Tesla as a holding.
+Access Form 13F holdings in structured JSON format, including information on current and historical portfolio holdings of SEC-registered funds and investment managers, including issuer name, title of the securities class, CUSIP, CIK and ticker of the holding, value of the position in dollar, the number of shares held, investment discretion, voting authority, and more.
 
 ```python
-from sec_api import QueryApi
+from sec_api import Form13FHoldingsApi
 
-queryApi = QueryApi(api_key="YOUR_API_KEY")
+form13FHoldingsApi = Form13FHoldingsApi(api_key="YOUR_API_KEY")
 
-query = {
-  "query": "formType:\"13F\" AND holdings.ticker:TSLA",
+search_params = {
+  "query": "cik:1350694 AND periodOfReport:2024-03-31",
   "from": "0",
   "size": "10",
   "sort": [{ "filedAt": { "order": "desc" } }]
 }
 
-filings = queryApi.get_filings(query)
+response = form13FHoldingsApi.get_data(search_params)
+holdings = response["data"]
+
+print(holdings)
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/query-api/13f-institutional-ownership-api
+> See the documentation for more details: https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
+
+## Form 13F Cover Pages API
+
+Search and access cover pages of Form 13F filings in standardized JSON format. Cover pages include details about the investment manager and fund, such as CIK, SEC file and CRD number, name, address, report type, other managers, and more.
+
+```python
+from sec_api import Form13FCoverPagesApi
+
+form13FCoverPagesApi = Form13FCoverPagesApi(api_key="YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:1698218 AND periodOfReport:[2023-01-1 TO 2024-12-31]",
+    "from": "0",
+    "size": "10",
+    "sort": [{ "filedAt": { "order": "desc" }}]
+}
+
+response = form13FCoverPagesApi.get_data(query)
+cover_pages = response["data"]
+
+print(cover_pages)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
 
 ## Form 13D/13G API
 
@@ -782,19 +831,53 @@ from sec_api import FormNportApi
 
 nportApi = FormNportApi("YOUR_API_KEY")
 
-response = nportApi.get_data(
-    {
-        "query": "fundInfo.totAssets:[100000000 TO *]",
-        "from": "0",
-        "size": "10",
-        "sort": [{"filedAt": {"order": "desc"}}],
-    }
-)
+search_params =  {
+    "query": "fundInfo.totAssets:[100000000 TO *]",
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = nportApi.get_data(search_params)
 
 print(response["filings"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
+
+## Form N-PX Proxy Voting Records API
+
+The Form N-PX API consists of two APIs: the N-PX Search API and the Voting Records API. The N-PX Search API enables filtering all N-PX filings published on the SEC EDGAR database since 2024. The API accepts search queries as JSON formatted payload and returns the matching N-PX filings in JSON format. The Voting Records API allows downloading the proxy voting records in structured JSON format for a specific filing by providing the filing's accession number.
+
+```python
+from sec_api import FormNPXApi
+
+formNpxApi = FormNPXApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:884546",
+    "from": "0",
+    "size": "1",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+# get N-PX filing metadata: registrant type, investment company type,
+# series and class IDs, report type, period of report, and more
+response = formNpxApi.get_metadata(search_params)
+npx_filing_metadata = response["data"]
+
+print(npx_filing_metadata)
+
+# get proxy voting records: issuer name, CUSIP, meeting date, vote description,
+# vote categories, shares voted, how voted, management recommendation, and more
+accessionNo = npx_filing_metadata[0]["accessionNo"]
+response = formNpxApi.get_voting_records(accessionNo)
+voting_records = response["proxyVotingRecords"]
+
+print(voting_records[0])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-npx-proxy-voting-records-api
 
 ## Form S-1/424B4 API
 
@@ -1102,27 +1185,27 @@ print(response["data"])
 }
 ```
 
-## AAER Database API
+## SEC Enforcement Actions Database API
 
-Access and search the Accounting and Auditing Enforcement Releases (AAER) database. The database includes all AAERs filed from 1997 to present.
+Access and search SEC enforcement actions published from 1997 to present. The database includes information about the parties involved in the action, nature of charges and complaints, penalty amounts, requested reliefs, violated rules and regulations, and more.
 
 ```python
-from sec_api import AaerApi
+from sec_api import SecEnforcementActionsApi
 
-aaerApi = AaerApi("YOUR_API_KEY")
+enforcementActionsApi = SecEnforcementActionsApi("YOUR_API_KEY")
 
-query = {
-    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+search_params = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
     "from": "0",
     "size": "50",
-    "sort": [{"dateTime": {"order": "desc"}}],
+    "sort": [{"releasedAt": {"order": "desc"}}],
 }
 
-response = aaerApi.get_data(query)
+response = enforcementActionsApi.get_data(search_params)
 print(response["data"])
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/aaer-database-api
+> See the documentation for more details: https://sec-api.io/docs/sec-enforcement-actions-database-api
 
 ## SEC Litigation Releases Database API
 
@@ -1145,6 +1228,50 @@ print(response["data"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/sec-litigation-releases-database-api
+
+## SEC Administrative Proceedings Database API
+
+Access and search all 18,000+ administrative proceedings filed by the SEC from 1995 to present. The database includes information about respondents (name, CIK, ticker), type of proceeding, publication dates, complaints and orders, violated rules and regulations, disgorgement amounts, penalties, and more.
+
+```python
+from sec_api import SecAdministrativeProceedingsApi
+
+adminProceedingsApi = SecAdministrativeProceedingsApi("YOUR_API_KEY")
+
+searchRequest = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"releasedAt": {"order": "desc"}}],
+}
+
+response = adminProceedingsApi.get_data(searchRequest)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/sec-administrative-proceedings-database-api
+
+## AAER Database API
+
+Access and search the Accounting and Auditing Enforcement Releases (AAER) database. The database includes all AAERs filed from 1997 to present.
+
+```python
+from sec_api import AaerApi
+
+aaerApi = AaerApi("YOUR_API_KEY")
+
+query = {
+    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"dateTime": {"order": "desc"}}],
+}
+
+response = aaerApi.get_data(query)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/aaer-database-api
 
 ## SRO Filings Database API
 

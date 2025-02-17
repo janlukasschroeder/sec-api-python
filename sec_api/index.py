@@ -13,8 +13,12 @@ extractor_api_endpoint = "https://api.sec-api.io/extractor"
 form_adv_endpoint = "https://api.sec-api.io/form-adv"
 #
 insider_api_endpoint = "https://api.sec-api.io/insider-trading"
+form_13F_holdings_endpoint = "https://api.sec-api.io/form-13f/holdings"
+form_13F_cover_pages_endpoint = "https://api.sec-api.io/form-13f/cover-pages"
 form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
 form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
+#
+form_NPX_endpoint = "https://api.sec-api.io/form-npx"
 #
 form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
@@ -29,8 +33,12 @@ directors_board_members_api_endpoint = (
 float_api_endpoint = "https://api.sec-api.io/float"
 subsidiary_endpoint = "https://api.sec-api.io/subsidiaries"
 #
-aaer_search_endpoint = "https://api.sec-api.io/aaers"
+sec_enforcement_actions = "https://api.sec-api.io/sec-enforcement-actions"
 sec_litigations_search_endpoint = "https://api.sec-api.io/sec-litigation-releases"
+sec_administrative_proceedings_endpoint = (
+    "https://api.sec-api.io/sec-administrative-proceedings"
+)
+aaer_search_endpoint = "https://api.sec-api.io/aaers"
 sro_search_endpoint = "https://api.sec-api.io/sro"
 #
 mapping_api_endpoint = "https://api.sec-api.io/mapping"
@@ -421,6 +429,66 @@ class InsiderTradingApi:
             handle_api_error(response)
 
 
+class Form13FHoldingsApi:
+    """
+    Base class for Form 13F Holdings API
+    https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_13F_holdings_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Form13FCoverPagesApi:
+    """
+    Base class for Form 13F Cover Pages API
+    https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_13F_cover_pages_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
 class FormNportApi:
     """
     Base class for Form NPORT API
@@ -644,6 +712,54 @@ class Form13DGApi:
             handle_api_error(response)
 
 
+class FormNPXApi:
+    """
+    Base class for Form N-PX Proxy Voting Records API
+    https://sec-api.io/docs/form-npx-proxy-voting-records-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint_metadata = form_NPX_endpoint + "?token=" + api_key
+        self.api_endpoint_records = (
+            form_NPX_endpoint + "/<accessionNo>?token=" + api_key
+        )
+        self.proxies = proxies if proxies else {}
+
+    def get_metadata(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint_metadata, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+    def get_voting_records(self, accessionNo):
+        api_endpoint = self.api_endpoint_records.replace("<accessionNo>", accessionNo)
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(api_endpoint, proxies=self.proxies)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
 class Form_S1_424B4_Api:
     """
     Base class for Form S1/424B4 API
@@ -702,15 +818,15 @@ class SubsidiaryApi:
             handle_api_error(response)
 
 
-class AaerApi:
+class SecEnforcementActionsApi:
     """
-    Base class for AAER Database API
-    https://sec-api.io/docs/aaer-database-api
+    Base class for SEC Enforcement Actions API
+    https://sec-api.io/docs/sec-enforcement-actions-database-api
     """
 
     def __init__(self, api_key, proxies=None):
         self.api_key = api_key
-        self.api_search_endpoint = aaer_search_endpoint + "?token=" + api_key
+        self.api_search_endpoint = sec_enforcement_actions + "?token=" + api_key
         self.proxies = proxies if proxies else {}
 
     def get_data(self, query):
@@ -741,6 +857,68 @@ class SecLitigationsApi:
     def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_search_endpoint = sec_litigations_search_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_search_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class SecAdministrativeProceedingsApi:
+    """
+    Base class for SEC Administrative Proceedings API
+    https://sec-api.io/docs/sec-administrative-proceedings-database-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_search_endpoint = (
+            sec_administrative_proceedings_endpoint + "?token=" + api_key
+        )
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_search_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class AaerApi:
+    """
+    Base class for AAER Database API
+    https://sec-api.io/docs/aaer-database-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_search_endpoint = aaer_search_endpoint + "?token=" + api_key
         self.proxies = proxies if proxies else {}
 
     def get_data(self, query):

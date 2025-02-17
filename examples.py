@@ -3,21 +3,34 @@ from sec_api.index import (
     PdfGeneratorApi,
     XbrlApi,
     ExtractorApi,
-    DirectorsBoardMembersApi,
-    ExecCompApi,
-    InsiderTradingApi,
-    FormNportApi,
-    FormDApi,
+    #
     FormAdvApi,
-    FloatApi,
+    #
+    InsiderTradingApi,
+    Form13FHoldingsApi,
+    Form13FCoverPagesApi,
+    FormNportApi,
     Form13DGApi,
+    #
+    FormNPXApi,
+    #
     Form_S1_424B4_Api,
-    SubsidiaryApi,
-    AaerApi,
-    SecLitigationsApi,
-    SroFilingsApi,
+    FormDApi,
+    #
     Item_4_02_Api,
     Form_8K_Item_X_Api,
+    #
+    DirectorsBoardMembersApi,
+    ExecCompApi,
+    SubsidiaryApi,
+    FloatApi,
+    #
+    SecEnforcementActionsApi,
+    SecLitigationsApi,
+    SecAdministrativeProceedingsApi,
+    AaerApi,
+    SroFilingsApi,
+    #
     MappingApi,
     EdgarEntitiesApi,
 )
@@ -26,25 +39,37 @@ from sec_api.index import (
 # Render API
 #
 """
-renderApi = RenderApi("YOUR_API_KEY")
+from sec_api import RenderApi
 
-# 10-K HTM File URL example
-filing_data = renderApi.get_filing(
-    # url="https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
-    url="https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
-)
+renderApi = RenderApi(api_key="YOUR_API_KEY")
 
-print(filing_data[:300])
+# example URLs: SEC filings, exhibits, images, Excel sheets, PDFs
+url_8k_html = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/nvda-20230222.htm"
+url_8k_txt = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/0001045810-23-000014.txt"
+url_exhibit99 = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/q4fy23pr.htm"
+url_xbrl_instance = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/nvda-20230222_htm.xml"
+url_excel_file = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/Financial_Report.xlsx"
+url_pdf_file = "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
+url_image_file = "https://www.sec.gov/Archives/edgar/data/1424404/000106299324017776/form10kxz001.jpg"
 
-# for non-text data, such as a PDF files or an images,
-# use get_file() and set `return_binary=True` to get the binary data
-pdf_file_url = (
-    "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
-)
-binary_data = renderApi.get_file(pdf_file_url, return_binary=True)
+filing_8k_html = renderApi.get_file(url_8k_html)
+filing_8k_txt = renderApi.get_file(url_8k_txt)
+exhibit99 = renderApi.get_file(url_exhibit99)
+xbrl_instance = renderApi.get_file(url_xbrl_instance)
 
-with open("filename.pdf", "wb") as f:
-    f.write(binary_data)
+# use .get_file() and set return_binary=True
+# to get non-text files such as images, PDFs, etc.
+excel_file = renderApi.get_file(url_excel_file, return_binary=True)
+pdf_file = renderApi.get_file(url_pdf_file, return_binary=True)
+image_file = renderApi.get_file(url_image_file, return_binary=True)
+
+# save files to disk
+with open("filing_8k_html.htm", "wb") as f:
+    f.write(filing_8k_html.encode("utf-8"))
+with open("pdf_file.pdf", "wb") as f:
+    f.write(pdf_file)
+with open("image.jpg", "wb") as f:
+    f.write(image_file)
 # """
 
 #
@@ -53,15 +78,19 @@ with open("filename.pdf", "wb") as f:
 """
 pdfGeneratorApi = PdfGeneratorApi("YOUR_API_KEY")
 
-# Form 8-K exhibit URL
-edgar_file_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
-# Form 10-K filing URL
-# edgar_file_url = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+# examples: 10-K filing, Form 8-K exhibit
+url_10k_filing = "https://www.sec.gov/Archives/edgar/data/320193/000032019320000096/aapl-20200926.htm"
+url_8k_exhibit_url = "https://www.sec.gov/ix?doc=/Archives/edgar/data/1320695/000132069520000148/ths12-31x201910krecast.htm"
 
-pdf_file = pdfGeneratorApi.get_pdf(edgar_file_url)
+# get PDFs
+pdf_10k_filing = pdfGeneratorApi.get_pdf(url_10k_filing)
+pdf_8k_exhibit = pdfGeneratorApi.get_pdf(url_8k_exhibit_url)
 
-with open("filename.pdf", "wb") as f:
-    f.write(pdf_file)
+# save PDFs to disk
+with open("pdf_10k_filing.pdf", "wb") as f:
+    f.write(pdf_10k_filing)
+with open("pdf_8k_exhibit.pdf", "wb") as f:
+    f.write(pdf_8k_exhibit)
 # """
 
 
@@ -184,6 +213,45 @@ insider_trades = insiderTradingApi.get_data(
 print(insider_trades["transactions"])
 # """
 
+
+#
+# Form 13F Holdings API Example
+#
+"""
+form13FHoldingsApi = Form13FHoldingsApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:1698218",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form13FHoldingsApi.get_data(search_params)
+
+print(response["data"])
+# """
+
+
+#
+# Form 13F Cover Pages API Example
+#
+"""
+form13FCoverPagesApi = Form13FCoverPagesApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:1698218",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form13FCoverPagesApi.get_data(search_params)
+
+print(response["data"])
+# """
+
+
 #
 # Form NPORT API Example
 #
@@ -296,6 +364,31 @@ print(response["filings"])
 
 
 #
+# Form N-PX API Examples
+#
+"""
+formNpxApi = FormNPXApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:884546",
+    "from": "0",
+    "size": "1",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = formNpxApi.get_metadata(search_params)
+npx_filing_metadata = response["data"]
+
+print(npx_filing_metadata)
+
+accessionNo = npx_filing_metadata[0]["accessionNo"]
+response = formNpxApi.get_voting_records(accessionNo)
+
+print(response["proxyVotingRecords"][0])
+# """
+
+
+#
 # Form S-1/424B4 API Example
 #
 """
@@ -330,24 +423,22 @@ response = subsidiaryApi.get_data(query)
 print(response["data"])
 # """
 
-
 #
-# AAER API Example
+# SEC Enforcement Actions API Example
 #
 """
-aaerApi = AaerApi("YOUR_API_KEY")
+enforcementActionsApi = SecEnforcementActionsApi("YOUR_API_KEY")
 
-query = {
-    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+search_params = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
     "from": "0",
     "size": "50",
-    "sort": [{"dateTime": {"order": "desc"}}],
+    "sort": [{"releasedAt": {"order": "desc"}}],
 }
 
-response = aaerApi.get_data(query)
+response = enforcementActionsApi.get_data(search_params)
 print(response["data"])
 # """
-
 
 #
 # SEC Litigation Releases API Example
@@ -363,6 +454,40 @@ query = {
 }
 
 response = secLitigationsApi.get_data(query)
+print(response["data"])
+# """
+
+#
+# SEC Administrative Proceedings API Example
+#
+"""
+adminProceedingsApi = SecAdministrativeProceedingsApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "releasedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"releasedAt": {"order": "desc"}}],
+}
+
+response = adminProceedingsApi.get_data(search_params)
+print(response["data"])
+# """
+
+#
+# AAER API Example
+#
+"""
+aaerApi = AaerApi("YOUR_API_KEY")
+
+query = {
+    "query": "dateTime:[2012-01-01 TO 2020-12-31]",
+    "from": "0",
+    "size": "50",
+    "sort": [{"dateTime": {"order": "desc"}}],
+}
+
+response = aaerApi.get_data(query)
 print(response["data"])
 # """
 

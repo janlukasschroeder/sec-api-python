@@ -8,15 +8,15 @@ from sec_api.index import PdfGeneratorApi
 from sec_api.index import XbrlApi
 from sec_api.index import ExtractorApi
 
-
-# Directors, Executives and Board Members APIs
-from sec_api.index import ExecCompApi
-from sec_api.index import DirectorsBoardMembersApi
-
 # Ownership APIs
 from sec_api.index import InsiderTradingApi
+from sec_api.index import Form13FHoldingsApi
+from sec_api.index import Form13FCoverPagesApi
 from sec_api.index import FormNportApi
 from sec_api.index import Form13DGApi
+
+# Form N-PX Proxy Voting Records
+from sec_api.index import FormNPXApi
 
 # Offering APIs
 from sec_api.index import Form_S1_424B4_Api
@@ -29,11 +29,19 @@ from sec_api.index import FormAdvApi
 from sec_api.index import Item_4_02_Api
 from sec_api.index import Form_8K_Item_X_Api
 
-# Other APIs
-from sec_api.index import MappingApi
-from sec_api.index import EdgarEntitiesApi
+# Directors, Executives and Board Members APIs
+from sec_api.index import ExecCompApi
+from sec_api.index import DirectorsBoardMembersApi
 from sec_api.index import FloatApi
 from sec_api.index import SubsidiaryApi
-from sec_api.index import AaerApi
+
+# Enforcement Actions, Litigations and Administrative Proceedings, SRO Filings
+from sec_api.index import SecEnforcementActionsApi
 from sec_api.index import SecLitigationsApi
+from sec_api.index import SecAdministrativeProceedingsApi
+from sec_api.index import AaerApi
 from sec_api.index import SroFilingsApi
+
+# Other APIs
+from sec_api.index import EdgarEntitiesApi
+from sec_api.index import MappingApi
