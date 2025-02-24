@@ -22,6 +22,7 @@ form_NPX_endpoint = "https://api.sec-api.io/form-npx"
 #
 form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
+form_C_endpoint = "https://api.sec-api.io/form-c"
 #
 form_8K_item_4_02_api_endpoint = "https://api.sec-api.io/form-8k"
 form_8K_item_x_api_endpoint = "https://api.sec-api.io/form-8k"
@@ -497,6 +498,36 @@ class FormNportApi:
     def __init__(self, api_key, proxies=None):
         self.api_key = api_key
         self.api_endpoint = form_nport_api_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FormCApi:
+    """
+    Base class for Form C API
+    https://sec-api.io/docs/form-c-crowdfunding-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_C_endpoint + "?token=" + api_key
         self.proxies = proxies if proxies else {}
 
     def get_data(self, query):

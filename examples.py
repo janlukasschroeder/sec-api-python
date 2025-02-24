@@ -15,6 +15,7 @@ from sec_api.index import (
     FormNPXApi,
     #
     Form_S1_424B4_Api,
+    FormCApi,
     FormDApi,
     #
     Item_4_02_Api,
@@ -268,6 +269,24 @@ response = nportApi.get_data(
 )
 
 print(response["filings"])
+# """
+
+#
+# Form C API Example
+#
+"""
+formCApi = FormCApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "id:*",
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = formCApi.get_data(search_params)
+
+print(response["data"])
 # """
 
 #

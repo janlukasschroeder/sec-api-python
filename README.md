@@ -32,6 +32,7 @@
 **Security Offerings APIs**
 
 - [Form S-1/424B4 API - Registration Statements and Prospectuses (IPOs, Debt/Warrants/... Offerings)](#form-s-1424b4-api)
+- [Form C API - Crowdfunding Offerings & Campaigns](#form-c-api---crowdfunding-campaigns)
 - [Form D API - Private Security Offerings](#form-d-api)
 
 **Structured Material Event Data from Form 8-K**
@@ -900,6 +901,29 @@ print(response["data"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/form-s1-424b4-data-search-api
+
+## Form C API - Crowdfunding Campaigns
+
+Search and access Form C filings of crowdfunding campaigns from 2016 to present. The database includes information about the issuer (name, number of employees, total assets, etc), the target amount to be raised, the type of security offered, the deadline of the campaign, and more.
+
+```python
+from sec_api import FormCApi
+
+formCApi = FormCApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "id:*",
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = formCApi.get_data(search_params)
+
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-c-crowdfunding-api
 
 ## Form D API
 

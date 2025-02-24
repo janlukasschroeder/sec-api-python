@@ -20,6 +20,7 @@ from sec_api.index import FormNPXApi
 
 # Offering APIs
 from sec_api.index import Form_S1_424B4_Api
+from sec_api.index import FormCApi
 from sec_api.index import FormDApi
 
 # Investment Adviser API
