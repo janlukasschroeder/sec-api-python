@@ -23,6 +23,10 @@ form_NPX_endpoint = "https://api.sec-api.io/form-npx"
 form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
 form_d_api_endpoint = "https://api.sec-api.io/form-d"
 form_C_endpoint = "https://api.sec-api.io/form-c"
+reg_A_search_all_endpoint = "https://api.sec-api.io/reg-a/search"
+form_1A_endpoint = "https://api.sec-api.io/reg-a/form-1a"
+form_1K_endpoint = "https://api.sec-api.io/reg-a/form-1k"
+form_1Z_endpoint = "https://api.sec-api.io/reg-a/form-1z"
 #
 form_8K_item_4_02_api_endpoint = "https://api.sec-api.io/form-8k"
 form_8K_item_x_api_endpoint = "https://api.sec-api.io/form-8k"
@@ -571,6 +575,118 @@ class FormDApi:
                 return response.json()
             elif response.status_code == 429:
                 # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class RegASearchAllApi:
+    """
+    Base class for Regulation A Search All API
+    https://sec-api.io/docs/reg-a-offering-statements-api#search-api-endpoint
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = reg_A_search_all_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Form1AApi:
+    """
+    Base class for Form 1-A API
+    https://sec-api.io/docs/reg-a-offering-statements-api#form-1-a-offering-statements-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_1A_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Form1KApi:
+    """
+    Base class for Form 1-K API
+    https://sec-api.io/docs/reg-a-offering-statements-api#form-1-k-annual-reports-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_1K_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class Form1ZApi:
+    """
+    Base class for Form 1-Z API
+    https://sec-api.io/docs/reg-a-offering-statements-api#form-1-z-exit-reports-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_1Z_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
                 time.sleep(0.5 * (x + 1))
             else:
                 handle_api_error(response)

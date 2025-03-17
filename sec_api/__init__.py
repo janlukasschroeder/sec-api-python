@@ -22,6 +22,10 @@ from sec_api.index import FormNPXApi
 from sec_api.index import Form_S1_424B4_Api
 from sec_api.index import FormCApi
 from sec_api.index import FormDApi
+from sec_api.index import RegASearchAllApi
+from sec_api.index import Form1AApi
+from sec_api.index import Form1KApi
+from sec_api.index import Form1ZApi
 
 # Investment Adviser API
 from sec_api.index import FormAdvApi

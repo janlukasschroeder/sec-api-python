@@ -1,6 +1,8 @@
-# SEC API - A SEC.gov EDGAR Filings Query & Real-Time Stream API
+# SEC API - Access SEC and EDGAR Data with Python
 
-**sec-api** is a Python package allowing you to search the entire SEC EDGAR filings corpus and access petabytes of regulatory information published by public and private companies, insiders such as directors and board members, hedge and mutual funds, financial advisors, business development companies, and more. It includes:
+[![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api) [![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs)
+
+**sec-api** is a Python package for searching and accessing the entire SEC EDGAR filings corpus, providing access to petabytes of regulatory data from public and private companies, insiders (directors, board members, etc.), funds (ETFs, hedge funds, etc.), financial advisors, business development companies, and more. It includes:
 
 **EDGAR Filing Search & Download APIs**
 
@@ -34,6 +36,7 @@
 - [Form S-1/424B4 API - Registration Statements and Prospectuses (IPOs, Debt/Warrants/... Offerings)](#form-s-1424b4-api)
 - [Form C API - Crowdfunding Offerings & Campaigns](#form-c-api---crowdfunding-campaigns)
 - [Form D API - Private Security Offerings](#form-d-api)
+- [Regulation A APIs - Offering Statements by Small Companies (Form 1-A, Form 1-K, Form 1-Z)](#regulation-a-apis)
 
 **Structured Material Event Data from Form 8-K**
 
@@ -947,6 +950,98 @@ print(response["offerings"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
+
+## Regulation A APIs
+
+Access and search all Regulation A offering statements (Tier 1 and 2) filed with the SEC from 2015 to present. The database includes Form 1-A (offerings), Form 1-K (annual reports) and Form 1-Z (exit report) filings as well as withdrawls and amendments. Information about the issuer (total assets, debt, etc.), offering (type, total amount, offering price, auditor, etc.), and more is available.
+
+### Search All Regulation A Filings
+
+```python
+from sec_api import RegASearchAllApi
+
+regASearchAllApi = RegASearchAllApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0", # increase by 50 to fetch the next 50 results
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = regASearchAllApi.get_data(search_params)
+offeringStatement = response["data"][0]
+
+print(offeringStatement)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
+
+### Form 1-A API
+
+```python
+from sec_api import Form1AApi
+
+form1AApi = Form1AApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "summaryInfo.indicateTier1Tier2Offering:Tier1",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1AApi.get_data(search_params)
+form1A = response["data"][0]
+
+print(form1A)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
+
+### Form 1-K API
+
+```python
+from sec_api import Form1KApi
+
+form1KApi = Form1KApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "fileNo:24R-00472",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1KApi.get_data(search_params)
+form1Ks = response["data"]
+
+print(form1Ks)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
+
+### Form 1-Z API
+
+```python
+from sec_api import Form1ZApi
+
+form1ZApi = Form1ZApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:*",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1ZApi.get_data(search_params)
+form1Zs = response["data"]
+
+print(form1Zs)
+```
+
+> See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
 
 ## Structured Data of Material Event Disclosures under Form 8-K
 

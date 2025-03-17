@@ -17,6 +17,10 @@ from sec_api.index import (
     Form_S1_424B4_Api,
     FormCApi,
     FormDApi,
+    RegASearchAllApi,
+    Form1AApi,
+    Form1KApi,
+    Form1ZApi,
     #
     Item_4_02_Api,
     Form_8K_Item_X_Api,
@@ -305,6 +309,88 @@ response = formDApi.get_data(
 )
 
 print(response["offerings"])
+# """
+
+#
+# Regulation A Search All API Example
+#
+"""
+regASearchAllApi = RegASearchAllApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "filedAt:[2024-01-01 TO 2024-12-31]",
+    "from": "0",  # increase by 50 to fetch the next 50 results
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = regASearchAllApi.get_data(search_params)
+offeringStatement = response["data"][0]
+
+print(offeringStatement)
+# """
+
+#
+# Form 1-A API
+#
+"""
+from sec_api import Form1AApi
+
+form1AApi = Form1AApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "summaryInfo.indicateTier1Tier2Offering:Tier1",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1AApi.get_data(search_params)
+form1A = response["data"][0]
+
+print(form1A)
+# """
+
+#
+# Form 1-K API
+#
+"""
+from sec_api import Form1KApi
+
+form1KApi = Form1KApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "fileNo:24R-00472",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1KApi.get_data(search_params)
+form1Ks = response["data"]
+
+print(form1Ks)
+# """
+
+#
+# Form 1-Z API
+#
+"""
+from sec_api import Form1ZApi
+
+form1ZApi = Form1ZApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "cik:*",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form1ZApi.get_data(search_params)
+form1Zs = response["data"]
+
+print(form1Zs)
 # """
 
 
