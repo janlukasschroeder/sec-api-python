@@ -10,6 +10,7 @@ from sec_api.index import ExtractorApi
 
 # Ownership APIs
 from sec_api.index import InsiderTradingApi
+from sec_api.index import Form144Api
 from sec_api.index import Form13FHoldingsApi
 from sec_api.index import Form13FCoverPagesApi
 from sec_api.index import FormNportApi

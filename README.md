@@ -23,6 +23,7 @@
 **Ownership Data APIs**
 
 - [Form 3/4/5 API - Insider Trading Disclosures](#insider-trading-data-api)
+- [Form 144 API - Restricted Stock Sales by Insiders](#form-144-api)
 - [Form 13F API - Institutional Investment Manager Holdings & Cover Pages](#form-13f-institutional-holdings-database)
 - [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
 - [Form N-PORT API - Mutual Funds, ETFs and Closed-End Fund Holdings](#form-n-port-api)
@@ -699,6 +700,29 @@ print(insider_trades["transactions"])
   }
 ]
 ```
+
+## Form 144 API
+
+The Form 144 API allows you to search and access all Form 144 filings from 2022 to present. Form 144 filings are filed with the SEC by corporate insiders who intend to sell restricted securities, such as vested stocks. The database includes information about the CIK and name of the insider, the issuer name and trading symbol, number of shares intended to be sold, the date of the transaction, the total value of the transaction, and more.
+
+```python
+from sec_api import Form144Api
+
+form144Api = Form144Api("YOUR_API_KEY")
+
+search_params = {
+    "query": "entities.ticker:TSLA",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form144Api.get_data(search_params)
+
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-144-restricted-sales-api
 
 ## Form 13F Institutional Holdings Database
 

@@ -7,6 +7,7 @@ from sec_api.index import (
     FormAdvApi,
     #
     InsiderTradingApi,
+    Form144Api,
     Form13FHoldingsApi,
     Form13FCoverPagesApi,
     FormNportApi,
@@ -216,6 +217,25 @@ insider_trades = insiderTradingApi.get_data(
 )
 
 print(insider_trades["transactions"])
+# """
+
+
+#
+# Form 144 API Example
+#
+"""
+form144Api = Form144Api("YOUR_API_KEY")
+
+search_params = {
+    "query": "entities.ticker:TSLA",
+    "from": "0",
+    "size": "1",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = form144Api.get_data(search_params)
+
+print(response["data"])
 # """
 
 
