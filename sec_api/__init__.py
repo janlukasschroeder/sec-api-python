@@ -16,7 +16,10 @@ from sec_api.index import Form13FCoverPagesApi
 from sec_api.index import FormNportApi
 from sec_api.index import Form13DGApi
 
+# Investment Companies:
+# Form N-CEN Annual Reports
 # Form N-PX Proxy Voting Records
+from sec_api.index import FormNcenApi
 from sec_api.index import FormNPXApi
 
 # Offering APIs

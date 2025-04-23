@@ -19,6 +19,7 @@ form_13F_cover_pages_endpoint = "https://api.sec-api.io/form-13f/cover-pages"
 form_nport_api_endpoint = "https://api.sec-api.io/form-nport"
 form_13D_13G_endpoint = "https://api.sec-api.io/form-13d-13g"
 #
+form_NCEN_endpoint = "https://api.sec-api.io/form-ncen"
 form_NPX_endpoint = "https://api.sec-api.io/form-npx"
 #
 form_S1_424B4_endpoint = "https://api.sec-api.io/form-s1-424b4"
@@ -881,6 +882,35 @@ class Form13DGApi:
                 return response.json()
             elif response.status_code == 429:
                 # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class FormNcenApi:
+    """
+    Base class for Form N-CEN API - Annual Reports of Registered Investment Companies
+    https://sec-api.io/docs/form-ncen-api-annual-reports-investment-companies
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = form_NCEN_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
                 time.sleep(0.5 * (x + 1))
             else:
                 handle_api_error(response)

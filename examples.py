@@ -13,6 +13,7 @@ from sec_api.index import (
     FormNportApi,
     Form13DGApi,
     #
+    FormNcenApi,
     FormNPXApi,
     #
     Form_S1_424B4_Api,
@@ -485,6 +486,24 @@ query = {
 
 response = form13DGApi.get_data(query)
 print(response["filings"])
+# """
+
+
+#
+# Form N-CEN API Example
+#
+"""
+formNcenApi = FormNcenApi("YOUR_API_KEY")
+
+search_params = {
+    "query": "accessionNo:*",
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = formNcenApi.get_data(search_params)
+print(response["data"])
 # """
 
 

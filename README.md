@@ -28,9 +28,10 @@
 - [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
 - [Form N-PORT API - Mutual Funds, ETFs and Closed-End Fund Holdings](#form-n-port-api)
 
-**Proxy Voting Records**
+**Investment Companies**
 
-- [Form N-PX Proxy Voting Records API](#form-n-px-proxy-voting-records-api)
+- [Form N-CEN API - Annual Reports](#form-n-cen-api---annual-reports-by-investment-companies)
+- [Form N-PX API - Proxy Voting Records](#form-n-px-proxy-voting-records-api)
 
 **Security Offerings APIs**
 
@@ -872,6 +873,28 @@ print(response["filings"])
 ```
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
+
+## Form N-CEN API - Annual Reports by Investment Companies
+
+The Form N-CEN API allows searching and accessing all Form N-CEN filings (annual reports by investment companies) from 2018 to present in a structured JSON format. The database includes information about the investment company, such as CIK, name, address, type of investment company, series information, directors, underwriters, total assets, and more. All types of funds are supported, including master-feeder, index, exchange-traded, money market, and more.
+
+```python
+from sec_api import FormNcenApi
+
+formNcenApi = FormNcenApi("YOUR_API_KEY")
+
+search_params = {
+    "query": 'managementInvestmentQuestionSeriesInfo.fundTypes:"Exchange-Traded Fund"',
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = formNcenApi.get_data(search_params)
+print(response["data"])
+```
+
+> See the documentation for more details: https://sec-api.io/docs/form-ncen-api-annual-reports-investment-companies
 
 ## Form N-PX Proxy Voting Records API
 
